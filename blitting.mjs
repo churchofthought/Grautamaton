@@ -1,4 +1,7 @@
 export default (gl, program) => {
+	
+
+
 	const buffer = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
 
@@ -13,4 +16,5 @@ export default (gl, program) => {
 
 	gl.vertexAttribPointer(loc, 2, gl.BYTE, false, 0, 0)
 	gl.enableVertexAttribArray(loc)
+	
 }
