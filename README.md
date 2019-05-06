@@ -1,4 +1,4 @@
-# Grautamaton
+# Grautamaton (WORK IN PROGRESS - NOT COMPLETED)
 General Relativity reproduced as a Hexagonal Cellular Automata (The Phenomena of Light and Gravity)
 
 # WebGL 2.0 Compute 
