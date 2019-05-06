@@ -27,7 +27,7 @@ window.onload = () => {
 		//console.log(x,y)
 
 		const centeredX = x - constants.CANVAS_WIDTH / 2
-		const centeredY = (constants.CANVAS_HEIGHT - y) - constants.CANVAS_HEIGHT / 2
+		const centeredY = constants.CANVAS_HEIGHT / 2 - y
 
 		const u = safeMod(2.0/3.0 * centeredX, constants.UNIVERSE_WIDTH)
 		const v = safeMod(-1.0/3.0 * centeredX + Math.sqrt(3.0)/3.0 * centeredY, constants.UNIVERSE_HEIGHT)
@@ -42,7 +42,7 @@ window.onload = () => {
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
 
 		const arr = new Uint32Array(constants.UNIVERSE_SIZE)
-		arr[0] = 0xFFFF
+		//arr[0] = 0xFFFF
 		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr, gl.STATIC_DRAW)
 		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, idx, buffer)
 	}

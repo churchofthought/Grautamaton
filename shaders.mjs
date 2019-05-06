@@ -39,7 +39,7 @@ const fragmentShaderSource = `#version 310 es
 		vec2 centeredCoords = gl_FragCoord.xy - vec2(float(CANVAS_WIDTH) / 2.0, float(CANVAS_HEIGHT) / 2.0);
 
 
-		vec2 hexCoord = mod(mat2(
+		vec2 hexCoord = mod(vec2(UNIVERSE_WIDTH, UNIVERSE_HEIGHT) + mat2(
 			2.0/3.0, -1.0/3.0,
 			0, sqrt(3.0)/3.0
 		) * centeredCoords, vec2(UNIVERSE_WIDTH, UNIVERSE_HEIGHT));
