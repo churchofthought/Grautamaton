@@ -20,42 +20,73 @@ window.onload = () => {
 	
 	setupBlitting(gl, renderProgram)
 
+
+	const safeMod = (x,y) => Math.floor((x + y) % y)
+	const mousePosToArr = (x, y) => {
+
+		//console.log(x,y)
+
+		const centeredX = x - constants.CANVAS_WIDTH / 2
+		const centeredY = (constants.CANVAS_HEIGHT - y) - constants.CANVAS_HEIGHT / 2
+
+		const u = safeMod(2.0/3.0 * centeredX, constants.UNIVERSE_WIDTH)
+		const v = safeMod(-1.0/3.0 * centeredX + Math.sqrt(3.0)/3.0 * centeredY, constants.UNIVERSE_HEIGHT)
+
+
+		//console.log(u,v)
+		return u * constants.UNIVERSE_HEIGHT + v
+	}
+
 	const bindUniverse = idx => {
 		const buffer = gl.createBuffer()
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
-		gl.bufferData(gl.SHADER_STORAGE_BUFFER, constants.UNIVERSE_BYTE_SIZE, gl.DYNAMIC_DRAW)
+
+		const arr = new Uint32Array(constants.UNIVERSE_SIZE)
+		arr[0] = 0xFFFF
+		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr, gl.STATIC_DRAW)
 		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, idx, buffer)
 	}
 
+	const bindRenderMeta = () => {
+		const buffer = gl.createBuffer()
+		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
+		gl.bufferData(gl.SHADER_STORAGE_BUFFER, 4, gl.STATIC_DRAW)
+		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, 2, buffer)
+	}
+
+	
+	bindRenderMeta();
 	[1,0].forEach(bindUniverse)
 	
 	const render = () => {
 		gl.useProgram(computeProgram)
-		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
-		gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
+		for (var i = 1; i--;)
+			gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
+		// gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT | gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
 		gl.useProgram(renderProgram)
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+		gl.drawArrays(gl.TRIANGLE_FAN, 0, 8)
 		requestAnimationFrame(render)
 	}
 
 	render()
 
-	const universe = new Uint32Array(constants.UNIVERSE_SIZE)
+	const universeView = new Uint32Array(1)
 	var mouseX = 0, mouseY = 0
 	const updateMouse = e => {
 		mouseX = e.offsetX
 		mouseY = e.offsetY
 	}
 	const mousedownHandler = () => {
-		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, 0, universe)
-		++universe[mouseX * constants.UNIVERSE_HEIGHT + (constants.UNIVERSE_HEIGHT - mouseY)]
-		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, 0, universe)
+		const offset = 4 * mousePosToArr(mouseX, mouseY)
+		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, offset, universeView)
+		++universeView[0]
+		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, offset, universeView)
 	}
 	var mousedownInterval = 0
 	canvas.onmousemove = updateMouse
 	canvas.onmousedown = e => {
 		updateMouse(e)
-		mousedownInterval = setInterval(mousedownHandler, 10)
+		mousedownInterval = setInterval(mousedownHandler, 0)
 	}
 	window.onmouseup = () => {
 		clearInterval(mousedownInterval)
