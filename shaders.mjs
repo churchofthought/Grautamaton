@@ -46,7 +46,7 @@ const fragmentShaderSource = `#version 310 es
 
 		uint v = universe[0].cells[uint(hexCoord.x)][uint(hexCoord.y)].x;
 
-		float col = pow(float(v) / float(colorMax), 0.5);
+		float col = pow(float(v) / float(colorMax), 0.1);
 		fragColor = vec4(col, col, col, 1.0);
 	}`
 
@@ -60,14 +60,14 @@ const transitionFunc = direction => {
 		#define NEXT universe[${direction ^ 1}].cells
 		#define VAL val${direction}
 
-		uint VAL = C(PREV).x - uint(6) * (C(PREV).x / uint(6)) + (
-			N(PREV).x / uint(6) +
-			NE(PREV).x / uint(6) +
-			SE(PREV).x / uint(6) +
-			S(PREV).x / uint(6) +
-			SW(PREV).x / uint(6) +
-			NW(PREV).x / uint(6)
-		);
+		uint VAL = 
+			C(PREV).x - (C(PREV).x >= uint(6) ? uint(6) : uint(0)) +
+			(N(PREV).x >= uint(6) ? uint(1) : uint(0)) +
+			(NE(PREV).x >= uint(6) ? uint(1) : uint(0)) +
+			(SE(PREV).x >= uint(6) ? uint(1) : uint(0)) +
+			(S(PREV).x >= uint(6) ? uint(1) : uint(0)) +
+			(SW(PREV).x >= uint(6) ? uint(1) : uint(0)) +
+			(NW(PREV).x >= uint(6) ? uint(1) : uint(0));
 
 		#if ${direction} == 1
 			atomicMax(colorMax, VAL);
