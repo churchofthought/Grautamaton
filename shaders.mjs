@@ -60,15 +60,24 @@ const transitionFunc = direction => {
 		#define NEXT universe[${direction ^ 1}].cells
 		#define VAL val${direction}
 
-		uint VAL = 
-			C(PREV).x - (C(PREV).x >= uint(6) ? uint(6) : uint(0)) +
-			(N(PREV).x >= uint(6) ? uint(1) : uint(0)) +
-			(NE(PREV).x >= uint(6) ? uint(1) : uint(0)) +
-			(SE(PREV).x >= uint(6) ? uint(1) : uint(0)) +
-			(S(PREV).x >= uint(6) ? uint(1) : uint(0)) +
-			(SW(PREV).x >= uint(6) ? uint(1) : uint(0)) +
-			(NW(PREV).x >= uint(6) ? uint(1) : uint(0));
+		// uint VAL = 
+		// 	C(PREV).x - (C(PREV).x >= uint(7) ? (uint(6) * (C(PREV).x / uint(7))) : uint(0)) +
+		// 	(N(PREV).x >= uint(7) ? N(PREV).x / uint(7) : uint(0)) +
+		// 	(NE(PREV).x >= uint(7) ? NE(PREV).x / uint(7) : uint(0)) +
+		// 	(SE(PREV).x >= uint(7) ? SE(PREV).x / uint(7) : uint(0)) +
+		// 	(S(PREV).x >= uint(7) ? S(PREV).x / uint(7) : uint(0)) +
+		// 	(SW(PREV).x >= uint(7) ? SW(PREV).x / uint(7) : uint(0)) +
+		// 	(NW(PREV).x >= uint(7) ? NW(PREV).x / uint(7) : uint(0));
 
+
+		uint VAL = 
+			C(PREV).x - (uint(6) * (C(PREV).x / uint(7))) +
+			N(PREV).x / uint(7)  +
+			NE(PREV).x / uint(7) +
+			SE(PREV).x / uint(7) +
+			S(PREV).x / uint(7)  +
+			SW(PREV).x / uint(7) +
+			NW(PREV).x / uint(7);
 		#if ${direction} == 1
 			atomicMax(colorMax, VAL);
 		#endif
