@@ -1099,14 +1099,13 @@ const transitionFunc = direction => {
 
 
 		uint VAL = 
-			C(PREV).x - (uint(6) * (C(PREV).x / uint(7))) +
-			N(PREV).x / uint(7)  +
-			NE(PREV).x / uint(7) +
-			SE(PREV).x / uint(7) +
-			S(PREV).x / uint(7)  +
-			SW(PREV).x / uint(7) +
-			NW(PREV).x / uint(7);
-			
+			//C(PREV).x - (uint(6) * (C(PREV).x / uint(7))) +
+			N(PREV).x / uint(6)  +
+			NE(PREV).x / uint(6) +
+			SE(PREV).x / uint(6) +
+			S(PREV).x / uint(6)  +
+			SW(PREV).x / uint(6) +
+			NW(PREV).x / uint(6);
 		#if ${direction} == 1
 			atomicMax(colorMax, VAL);
 		#endif
