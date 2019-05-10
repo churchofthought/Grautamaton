@@ -43,7 +43,9 @@ window.onload = () => {
 
 		const arr = new Uint32Array(constants.UNIVERSE_SIZE)
 		//arr[constants.UNIVERSE_SIZE - 1] = 20000
-		arr[0] = 20000
+		arr[0] = 3000000
+		arr[mousePosToArr(600, 600)] = 3000000
+		arr[mousePosToArr(300, 300)] = 3000000
 		//arr[1] = 20000
 		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr, gl.STATIC_DRAW)
 		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, idx, buffer)
@@ -62,7 +64,7 @@ window.onload = () => {
 	
 	const render = () => {
 		gl.useProgram(computeProgram)
-		//for (var i = 1; i--;)
+		for (var i = 128; i--;)
 			gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
 		// gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT | gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
 		gl.useProgram(renderProgram)
