@@ -10,7 +10,7 @@ precision highp float;
 precision highp int;
 
 struct Cell {
-	uint x;
+	float x;
 };
 
 layout(std430, binding = 0) coherent restrict ${type == "FRAGMENT" ? "readonly" : ""} buffer UniverseBufferData {
@@ -18,8 +18,21 @@ layout(std430, binding = 0) coherent restrict ${type == "FRAGMENT" ? "readonly" 
 } universe[2];
 
 layout(std430, binding = 2) restrict ${type == "FRAGMENT" ? "readonly" : "coherent"} buffer UniverseRenderData {
+	uint colorMin;
 	uint colorMax;
 };
+
+uint FloatFlip(uint f)
+{
+	uint mask = -(f >> 31) | uint(0x80000000);
+	return f ^ mask;
+}
+
+uint IFloatFlip(uint f)
+{
+	uint mask = ((f >> 31) - uint(1)) | uint(0x80000000);
+	return f ^ mask;
+}
 
 `
 
@@ -1061,6 +1074,8 @@ const fragmentShaderSource = `#version 310 es
 		vec3(1,1,1)
 	);
 
+
+
 	out vec4 fragColor;
 	void main(void) {
 		vec2 centeredCoords = gl_FragCoord.xy - vec2(float(CANVAS_WIDTH) / 2.0, float(CANVAS_HEIGHT) / 2.0);
@@ -1071,13 +1086,16 @@ const fragmentShaderSource = `#version 310 es
 			0, sqrt(3.0)/3.0
 		) * centeredCoords, vec2(UNIVERSE_WIDTH, UNIVERSE_HEIGHT));
 
-		uint v = universe[0].cells[uint(hexCoord.x)][uint(hexCoord.y)].x;
+		float v = universe[0].cells[uint(hexCoord.x)][uint(hexCoord.y)].x;
 
-		float col = float(v) / float(colorMax);
+		float min = uintBitsToFloat(IFloatFlip(colorMin));
+		float max = uintBitsToFloat(IFloatFlip(colorMax));
+
+		float c = (v - min) / (max - min);
 		
-		fragColor = vec4(gradient[uint(col * float(1024))], 1.0);
+		//fragColor = vec4(c, c, c, 1.0);
+		fragColor = vec4(gradient[uint(c * float(1024))], 1.0);
 	}`
-
 
 const transitionFunc = direction => {
 	return `
@@ -1098,16 +1116,18 @@ const transitionFunc = direction => {
 		// 	(NW(PREV).x >= uint(7) ? NW(PREV).x / uint(7) : uint(0));
 
 
-		uint VAL = 
-			//C(PREV).x - (uint(6) * (C(PREV).x / uint(7))) +
-			N(PREV).x / uint(6)  +
-			NE(PREV).x / uint(6) +
-			SE(PREV).x / uint(6) +
-			S(PREV).x / uint(6)  +
-			SW(PREV).x / uint(6) +
-			NW(PREV).x / uint(6);
+		float VAL = 
+			-C(PREV).x / pow(6.0,4.0) +
+			N(PREV).x / 6.0  +
+			NE(PREV).x / 6.0 +
+			SE(PREV).x / 6.0 +
+			S(PREV).x / 6.0  +
+			SW(PREV).x / 6.0 +
+			NW(PREV).x / 6.0;
 		#if ${direction} == 1
-			atomicMax(colorMax, VAL);
+			uint flipped = FloatFlip(floatBitsToUint(VAL));
+			atomicMin(colorMin, flipped);
+			atomicMax(colorMax, flipped);
 		#endif
 
 		C(NEXT).x = VAL;
@@ -1135,9 +1155,11 @@ const computeShaderSource = `#version 310 es
 		uint x = gl_GlobalInvocationID.x;
 		uint y = gl_GlobalInvocationID.y;
 		if (x == uint(0) && y == uint(0)){
-			colorMax = uint(1);
+			 colorMin = FloatFlip(floatBitsToUint(1.0));
+			 colorMax = FloatFlip(floatBitsToUint(1.0));
 		}
 		barrier();
+		memoryBarrierBuffer();
 
 		uint xm1 = x == uint(0) ? uint(UNIVERSE_WIDTH - 1) : x - uint(1);
 		uint xp1 = x == uint(UNIVERSE_WIDTH - 1) ? uint(0) : x + uint(1);
@@ -1151,9 +1173,9 @@ const computeShaderSource = `#version 310 es
 
 const lined = (s) => s.split(/[\r\n]+/).map((x, i) => `${i}. ${x}`).join("\n")
 
-console.log(
-	lined(fragmentShaderSource) + "\n=====================================\n" + lined(computeShaderSource)
-)
+// console.log(
+// 	lined(fragmentShaderSource) + "\n=====================================\n" + lined(computeShaderSource)
+// )
 export default gl => {
 
 	const createShader = (program, sourceCode, type) => {
