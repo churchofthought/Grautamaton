@@ -24,7 +24,7 @@ uvec2 idx(uint x, uint y){
 	return uvec2(intIndex, bitIndex);
 }
 
-#define GET_CELL(u, index) ((u[index.x] & (uint(1) << index.y)) != uint(0))
+#define GET_CELL(u, index) ((u[index.x] & (uint(1) << index.y)) >> index.y)
 
 #define SET_CELL(u, index, val) (val ? atomicOr(u[index.x], uint(1) << index.y) : atomicAnd(u[index.x], ~(uint(1) << index.y)));
 
@@ -55,9 +55,9 @@ const fragmentShaderSource = `#version 310 es
 
 		uvec2 index = idx(hexCoords.x, hexCoords.y);
 
-		fragColor = GET_CELL(universe[0].cells, index)
-			? vec4(1.0,1.0,1.0,1.0) 
-			: vec4(0.0,0.0,0.0,1.0);
+		fragColor = GET_CELL(universe[0].cells, index) == uint(0)
+			? vec4(0.0,0.0,0.0,1.0) 
+			: vec4(1.0,1.0,1.0,1.0);
 	}`
 
 const transitionFunc = direction => {
@@ -68,14 +68,14 @@ const transitionFunc = direction => {
 			#undef NEXT
 			#define NEXT universe[${direction ^ 1}].cells
 
-			SET_CELL(NEXT, C, transition(bool[7](
-				GET_CELL(PREV, C),
+			SET_CELL(NEXT, C, transition(uint[7](
 				GET_CELL(PREV, N),
 				GET_CELL(PREV, NE),
 				GET_CELL(PREV, SE),
 				GET_CELL(PREV, S),
 				GET_CELL(PREV, SW),
-				GET_CELL(PREV, NW)
+				GET_CELL(PREV, NW),
+				GET_CELL(PREV, C)
 			)));
 	`
 }
@@ -86,15 +86,33 @@ const computeShaderSource = `#version 310 es
 
 	${HEADER_INCLUDE("COMPUTE")}
 
-	bool transition(bool[7] neighborhood){
-		return 
-		(float(
-		uint(neighborhood[1]) + 
-		uint(neighborhood[2]) + 
-		uint(neighborhood[3]) + 
-		uint(neighborhood[4]) + 
-		uint(neighborhood[5]) + 
-		uint(neighborhood[6])) / 6.0) > 0.17;
+	#define True true
+	#define False false
+	bool[128] rule = bool[](
+		True, False, True, False, True, False, True, False, True, False, \
+		True, True, True, False, False, True, True, False, False, True, True, \
+		True, False, True, True, False, False, True, False, True, True, \
+		False, True, False, True, True, False, True, False, True, True, True, \
+		True, False, False, True, False, False, True, False, False, True, \
+		False, True, False, True, False, True, False, False, True, False, \
+		True, False, True, False, True, False, True, True, False, True, \
+		False, True, False, True, False, True, True, False, True, True, \
+		False, True, True, False, False, False, False, True, False, True, \
+		False, False, True, False, True, False, False, True, False, True, \
+		True, False, False, True, False, False, False, True, True, False, \
+		False, True, True, False, False, False, True, False, True, False, \
+		True, False, True, False, True, False
+	);
+
+	bool transition(uint[7] neighborhood){
+		uint no = (neighborhood[0] << uint(6)) +
+							(neighborhood[1] << uint(5)) +
+							(neighborhood[2] << uint(4)) +
+							(neighborhood[3] << uint(3)) +
+							(neighborhood[4] << uint(2)) +
+							(neighborhood[5] << uint(1)) +
+							(neighborhood[6]);
+		return rule[no];
 	}
 
 	void main(void){
@@ -106,13 +124,13 @@ const computeShaderSource = `#version 310 es
 		uint ym1 = y == uint(0) ? uint(UNIVERSE_HEIGHT - 1) : y - uint(1);
 		uint yp1 = y == uint(UNIVERSE_HEIGHT - 1) ? uint(0) : y + uint(1);
 
-		uvec2 C = idx(x, y);
 		uvec2 N = idx(x,ym1);
 		uvec2 NE = idx(xp1,ym1);
 		uvec2 SE = idx(xp1,y);
 		uvec2 S = idx(x,yp1);
 		uvec2 SW = idx(xm1,yp1);
 		uvec2 NW = idx(xm1,y);
+		uvec2 C = idx(x, y);
 
 		
 		

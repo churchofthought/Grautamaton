@@ -42,11 +42,18 @@ window.onload = () => {
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
 
 		const arr = new Uint8Array(constants.UNIVERSE_SIZE / 8)
+
+		for (var i = constants.UNIVERSE_SIZE / 8; i--;){
+			arr[i] = Math.floor(Math.random() * 256)
+		}
+
 		//arr[constants.UNIVERSE_SIZE - 1] = 20000
 		// for (var x = 0; x < constants.UNIVERSE_WIDTH; x++)
 		// 	for (var y = 0; y < constants.UNIVERSE_HEIGHT; y++)
 		// 		arr[x * constants.UNIVERSE_HEIGHT + y] = -1.0
-		//arr[0] = 0x1
+
+		//arr[0] = 255
+
 		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr, gl.STATIC_DRAW)
 		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, idx, buffer)
 	}
@@ -64,9 +71,9 @@ window.onload = () => {
 
 	const render = () => {
 		gl.useProgram(computeProgram)
-		//for (var i = 32; i--;)
+		//for (var i = 16; i--;)
 			gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
-		// gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT | gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
+		//gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(renderProgram)
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 8)
 		requestAnimationFrame(render)
@@ -86,10 +93,10 @@ window.onload = () => {
 		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
 		// right click
 		if (button == 2){
-			universeView[0] &= ~(1 << bitOffset)
+			universeView[0] |= 1 << bitOffset
 		// left click
 		}else if (button == 0){
-			universeView[0] |= 1 << bitOffset
+			universeView[0] &= ~(1 << bitOffset)
 		}else{
 			// middle click
 			universeView[0] ^= 1 << bitOffset
