@@ -52,7 +52,11 @@ window.onload = () => {
 		// 	for (var y = 0; y < constants.UNIVERSE_HEIGHT; y++)
 		// 		arr[x * constants.UNIVERSE_HEIGHT + y] = -1.0
 
-		//arr[0] = 255
+		// arr[0] = Math.floor(Math.random() * 256)
+		
+		// for (var i = Math.floor(constants.UNIVERSE_SIZE / 8 / 10); i--;){
+		// 	arr[i] = Math.floor(Math.random() * 256)
+		// }
 
 		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr, gl.STATIC_DRAW)
 		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, idx, buffer)
@@ -71,7 +75,7 @@ window.onload = () => {
 
 	const render = () => {
 		gl.useProgram(computeProgram)
-		//for (var i = 16; i--;)
+		// for (var i = 256; i--;)
 			gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
 		//gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(renderProgram)
