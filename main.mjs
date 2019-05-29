@@ -41,9 +41,9 @@ window.onload = () => {
 		const buffer = gl.createBuffer()
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
 
-		const arr = new Uint8Array(constants.UNIVERSE_SIZE / 8)
+		const arr = new Uint8Array(constants.UNIVERSE_BYTE_SIZE)
 
-		for (var i = constants.UNIVERSE_SIZE / 8; i--;){
+		for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
 			arr[i] = Math.floor(Math.random() * 256)
 		}
 
@@ -91,7 +91,7 @@ window.onload = () => {
 		({offsetX, offsetY} = event)
 	}
 	const mousedownHandler = () => {
-		const offset = mousePosToArr(offsetX, offsetY)
+		const offset = 2 * mousePosToArr(offsetX, offsetY)
 		const byteOffset = Math.floor(offset / 8)
 		const bitOffset = offset % 8
 		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)

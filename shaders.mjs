@@ -16,7 +16,7 @@ layout(std430, binding = 0) coherent restrict ${type == "FRAGMENT" ? "readonly" 
 
 uvec2 idx(uint x, uint y){
 	
-	uint index = (x % uint(UNIVERSE_WIDTH)) * uint(UNIVERSE_HEIGHT) + (y % uint(UNIVERSE_HEIGHT));
+	uint index = uint(2) * ((x % uint(UNIVERSE_WIDTH)) * uint(UNIVERSE_HEIGHT) + (y % uint(UNIVERSE_HEIGHT)));
 
 	uint intIndex = index / uint(32);
 	uint bitIndex = index - (intIndex * uint(32));
@@ -24,9 +24,10 @@ uvec2 idx(uint x, uint y){
 	return uvec2(intIndex, bitIndex);
 }
 
-#define GET_CELL(u, index) ((u[index.x] & (uint(1) << index.y)) >> index.y)
+#define GET_CELL(u, index) ((u[index.x] & (uint(3) << index.y)) >> index.y)
 
-#define SET_CELL(u, index, val) (val ? atomicOr(u[index.x], uint(1) << index.y) : atomicAnd(u[index.x], ~(uint(1) << index.y)));
+#define SET_CELL(u, index, val) atomicAnd(u[index.x], ~(uint(3) << index.y)); \
+atomicOr(u[index.x], val << index.y);
 
 `
 
@@ -41,7 +42,12 @@ const fragmentShaderSource = `#version 310 es
 
 	${HEADER_INCLUDE("FRAGMENT")}
 
-
+	vec4 colors[4] = vec4[](
+		vec4(1.0,1.0,1.0,1.0),
+		vec4(1.0,0.0,0.0,1.0),
+		vec4(0.0,1.0,0.0,1.0),
+		vec4(0.0,0.0,1.0,1.0)
+	);
 
 	out vec4 fragColor;
 	void main(void) {
@@ -54,10 +60,8 @@ const fragmentShaderSource = `#version 310 es
 		) * centeredCoords, vec2(UNIVERSE_WIDTH, UNIVERSE_HEIGHT)));
 
 		uvec2 index = idx(hexCoords.x, hexCoords.y);
-
-		fragColor = GET_CELL(universe[0].cells, index) == uint(0)
-			? vec4(0.0,0.0,0.0,1.0) 
-			: vec4(1.0,1.0,1.0,1.0);
+		
+		fragColor = colors[GET_CELL(universe[0].cells, index)];
 	}`
 
 const transitionFunc = direction => {
@@ -85,27 +89,32 @@ const computeShaderSource = `#version 310 es
 
 	${HEADER_INCLUDE("COMPUTE")}
 
-	bool[14] rule = bool[](
-		false, false,
-		false, false,
-		false, false,
-		true, true,
-		false, true,
-		false, true,
-		false, true
+	int vals[4] = int[](
+		0, -1, 1, 0
 	);
+	int conv(uint v){
+		return vals[v];
+	}
 
-	bool transition(uint center, uint[6] neighborhood){
-		uint sum = ( 
-			neighborhood[0]
-			+ neighborhood[1]
-			+ neighborhood[2]
-			+ neighborhood[3]
-			+ neighborhood[4] 
-			+ neighborhood[5]
-		);
+	#define COUNT(center, neighborhood, val) ( \
+		(center == val ? uint(1) : uint(0)) + \
+		(neighborhood[0] == val ? uint(1) : uint(0)) + \
+		(neighborhood[1] == val ? uint(1) : uint(0)) + \
+		(neighborhood[2] == val ? uint(1) : uint(0)) + \
+		(neighborhood[3] == val ? uint(1) : uint(0)) + \
+		(neighborhood[4] == val ? uint(1) : uint(0)) + \
+		(neighborhood[5] == val ? uint(1) : uint(0)) \
+	)
 
-		return rule[sum * uint(2) + center];
+	uint transition(uint center, uint[6] neighborhood){
+		uint s0 = COUNT(center, neighborhood, uint(0));
+		uint s1 = COUNT(center, neighborhood, uint(1));
+		uint s2 = COUNT(center, neighborhood, uint(2));
+
+		if (s1 > s2) return uint(1);
+		if (s2 > s1) return uint(2);
+		if (center == uint(0)) return uint(1);
+		return uint(0);
 	}
 
 	void main(void){
@@ -115,37 +124,17 @@ const computeShaderSource = `#version 310 es
 		uvec2 C = idx(x, y);
 
 		uvec2[6] idxes = uvec2[](
-			// 1-away
-			// 6 count
 			idx(x+uint(0),y-uint(1)),
 			idx(x+uint(1),y-uint(1)),
 			idx(x+uint(1),y+uint(0)),
 			idx(x+uint(0),y+uint(1)),
 			idx(x-uint(1),y+uint(1)),
 			idx(x-uint(1),y+uint(0))
-
-			// 2-uint(away)
-			// 12 count
-			// idx(x+uint(0),y-uint(2)),
-			// idx(x+uint(1),y-uint(2)),
-			// idx(x+uint(2),y-uint(2)),
-			// idx(x+uint(2),y-uint(1)),
-			// idx(x+uint(2),y+uint(0)),
-			// idx(x+uint(1),y+uint(1)),
-
-			// idx(x+uint(0),y+uint(2)),
-			// idx(x-uint(1),y+uint(2)),
-			// idx(x-uint(2),y+uint(2)),
-			// idx(x-uint(2),y+uint(1)),
-			// idx(x-uint(2),y+uint(0)),
-			// idx(x-uint(1),y-uint(1))
 		);
 		
-		
-
 		${transitionFunc(0)}
-		//barrier();
-		//memoryBarrierBuffer();
+		barrier();
+		memoryBarrierBuffer();
 		${transitionFunc(1)}
 	}`
 
