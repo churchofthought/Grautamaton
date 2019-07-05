@@ -43,16 +43,16 @@ window.onload = () => {
 
 		const arr = new Uint8Array(constants.UNIVERSE_BYTE_SIZE)
 
-		for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
-			arr[i] = Math.floor(Math.random() * 256)
-		}
+		// for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
+		// 	arr[i] = Math.floor(Math.random() * 256)
+		// }
 
 		//arr[constants.UNIVERSE_SIZE - 1] = 20000
 		// for (var x = 0; x < constants.UNIVERSE_WIDTH; x++)
 		// 	for (var y = 0; y < constants.UNIVERSE_HEIGHT; y++)
 		// 		arr[x * constants.UNIVERSE_HEIGHT + y] = -1.0
 
-		// arr[0] = Math.floor(Math.random() * 256)
+		//arr[0] = 3
 		
 		// for (var i = Math.floor(constants.UNIVERSE_SIZE / 8 / 10); i--;){
 		// 	arr[i] = Math.floor(Math.random() * 256)
@@ -73,11 +73,13 @@ window.onload = () => {
 	// bindRenderMeta();
 	[1, 0].forEach(bindUniverse)
 
+	var z = 0
 	const render = () => {
 		gl.useProgram(computeProgram)
 		// for (var i = 256; i--;)
+		if (z++ % 10 == 0)
 			gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
-		//gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
+		gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(renderProgram)
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 8)
 		requestAnimationFrame(render)
@@ -95,15 +97,20 @@ window.onload = () => {
 		const byteOffset = Math.floor(offset / 8)
 		const bitOffset = offset % 8
 		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
+
+		const orig = (universeView[0] & (3 << bitOffset)) >> bitOffset
 		// right click
 		if (button == 2){
-			universeView[0] |= 1 << bitOffset
+			universeView[0] &= ~(3 << bitOffset)
+			universeView[0] |= (orig - 1) << bitOffset
 		// left click
 		}else if (button == 0){
-			universeView[0] &= ~(1 << bitOffset)
+			universeView[0] &= ~(3 << bitOffset)
+			universeView[0] |= (orig + 1) << bitOffset
 		}else{
 			// middle click
-			universeView[0] ^= 1 << bitOffset
+			universeView[0] &= ~(3 << bitOffset)
+			universeView[0] |= (3 - orig) << bitOffset
 		}
 		
 		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)

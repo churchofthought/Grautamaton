@@ -29,6 +29,18 @@ uvec2 idx(uint x, uint y){
 #define SET_CELL(u, index, val) atomicAnd(u[index.x], ~(uint(3) << index.y)); \
 atomicOr(u[index.x], val << index.y);
 
+vec4 colors[4] = vec4[](
+	vec4(0.0,0.0,0.0,1.0),
+	vec4(1.0,0.0,0.0,1.0),
+	vec4(0.0,1.0,0.0,1.0),
+	vec4(0.0,0.0,1.0,1.0)
+);
+
+#define BLACK uint(0)
+#define RED uint(1)
+#define GREEN uint(2)
+#define BLUE uint(3)
+
 `
 
 const vertexShaderSource = `#version 310 es
@@ -42,12 +54,7 @@ const fragmentShaderSource = `#version 310 es
 
 	${HEADER_INCLUDE("FRAGMENT")}
 
-	vec4 colors[4] = vec4[](
-		vec4(1.0,1.0,1.0,1.0),
-		vec4(1.0,0.0,0.0,1.0),
-		vec4(0.0,1.0,0.0,1.0),
-		vec4(0.0,0.0,1.0,1.0)
-	);
+
 
 	out vec4 fragColor;
 	void main(void) {
@@ -89,15 +96,7 @@ const computeShaderSource = `#version 310 es
 
 	${HEADER_INCLUDE("COMPUTE")}
 
-	int vals[4] = int[](
-		0, -1, 1, 0
-	);
-	int conv(uint v){
-		return vals[v];
-	}
-
 	#define COUNT(center, neighborhood, val) ( \
-		(center == val ? uint(1) : uint(0)) + \
 		(neighborhood[0] == val ? uint(1) : uint(0)) + \
 		(neighborhood[1] == val ? uint(1) : uint(0)) + \
 		(neighborhood[2] == val ? uint(1) : uint(0)) + \
@@ -107,14 +106,19 @@ const computeShaderSource = `#version 310 es
 	)
 
 	uint transition(uint center, uint[6] neighborhood){
-		uint s0 = COUNT(center, neighborhood, uint(0));
-		uint s1 = COUNT(center, neighborhood, uint(1));
-		uint s2 = COUNT(center, neighborhood, uint(2));
+		if (center == BLUE)
+			return RED;
 
-		if (s1 > s2) return uint(1);
-		if (s2 > s1) return uint(2);
-		if (center == uint(0)) return uint(1);
-		return uint(0);
+		if (center == GREEN)
+			return RED;
+
+		if (COUNT(center, neighborhood, BLUE) >= uint(1) && center == BLACK)
+			return BLUE;
+
+		if (COUNT(center, neighborhood, GREEN) >= uint(1) && center == BLACK)
+			return GREEN;	
+
+		return center;
 	}
 
 	void main(void){
