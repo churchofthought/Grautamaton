@@ -1,6 +1,7 @@
 import createPrograms from "./shaders.mjs"
 import setupBlitting from "./blitting.mjs"
 import constants from "./constants.mjs"
+import util from "./util.js"
 
 
 
@@ -102,15 +103,15 @@ window.onload = async () => {
 		// right click
 		if (button == 2){
 			universeView[0] &= ~(3 << bitOffset)
-			universeView[0] |= (orig - 1) << bitOffset
+			universeView[0] |= util.mod(orig - 1, constants.CELL_STATES) << bitOffset
 		// left click
 		}else if (button == 0){
 			universeView[0] &= ~(3 << bitOffset)
-			universeView[0] |= (orig + 1) << bitOffset
+			universeView[0] |= util.mod(orig + 1, constants.CELL_STATES) << bitOffset
 		}else{
 			// middle click
 			universeView[0] &= ~(3 << bitOffset)
-			universeView[0] |= (3 - orig) << bitOffset
+			universeView[0] |= (constants.CELL_STATES - orig) << bitOffset
 		}
 		
 		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)

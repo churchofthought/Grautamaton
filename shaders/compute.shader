@@ -14,16 +14,16 @@ SET_CELL(dir ^ 1, C, transition(GET_CELL(dir ^ 0, C), uint[]( \
 )));
 
 uint transition(uint center, uint[6] neighborhood){
-  if (center == BLUE)
-    return RED;
-  if (COUNT(neighborhood, BLUE) >= uint(1) && center == BLACK)
-    return BLUE;
-  if (center == BLUE)
-    return BLACK;
-  if (center == RED)
-    return BLACK;
+  // if (center == BLUE)
+  //   return RED;
+  // if (COUNT(neighborhood, BLUE) >= uint(1) && center == BLACK)
+  //   return BLUE;
+  // if (center == BLUE)
+  //   return BLACK;
+  // if (center == RED)
+  //   return BLACK;
 
-  return BLACK;
+  return center;
 }
 
 void main(void){

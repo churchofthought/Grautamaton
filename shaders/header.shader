@@ -1,9 +1,4 @@
-#define CANVAS_WIDTH ${constants.CANVAS_WIDTH}
-#define CANVAS_HEIGHT ${constants.CANVAS_HEIGHT}
-#define UNIVERSE_WIDTH ${constants.UNIVERSE_WIDTH}
-#define UNIVERSE_HEIGHT ${constants.UNIVERSE_HEIGHT}
-#define UNIVERSE_SIZE ${constants.UNIVERSE_SIZE}
-#define UNIVERSE_BYTE_SIZE ${constants.UNIVERSE_BYTE_SIZE}
+${constants.cDefines}
 
 #define BLACK uint(0)
 #define RED uint(1)
