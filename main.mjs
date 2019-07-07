@@ -4,7 +4,7 @@ import constants from "./constants.mjs"
 
 
 
-window.onload = () => {
+window.onload = async () => {
 	const canvas = document.querySelector("#glCanvas")
 	const gl = canvas.getContext("webgl2-compute")
 
@@ -16,7 +16,7 @@ window.onload = () => {
 	// gl.clearColor(0, 0.5, 0, 1)
 	// gl.clear(gl.COLOR_BUFFER_BIT)
 
-	const { renderProgram, computeProgram } = createPrograms(gl)
+	const { renderProgram, computeProgram } = await createPrograms(gl)
 
 	setupBlitting(gl, renderProgram)
 
@@ -52,7 +52,7 @@ window.onload = () => {
 		// 	for (var y = 0; y < constants.UNIVERSE_HEIGHT; y++)
 		// 		arr[x * constants.UNIVERSE_HEIGHT + y] = -1.0
 
-		//arr[0] = 3
+		//arr[0] = 1
 		
 		// for (var i = Math.floor(constants.UNIVERSE_SIZE / 8 / 10); i--;){
 		// 	arr[i] = Math.floor(Math.random() * 256)
@@ -65,7 +65,7 @@ window.onload = () => {
 	// const bindRenderMeta = () => {
 	// 	const buffer = gl.createBuffer()
 	// 	gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
-	// 	gl.bufferData(gl.SHADER_STORAGE_BUFFER, 8, gl.STATIC_DRAW)
+	// 	gl.bufferData(gl.SHADER_STORAGE_BUFFER, new Uint8Array([0]), gl.STATIC_DRAW)
 	// 	gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, 2, buffer)
 	// }
 
@@ -73,12 +73,12 @@ window.onload = () => {
 	// bindRenderMeta();
 	[1, 0].forEach(bindUniverse)
 
-	var z = 0
+	//var z = 0
 	const render = () => {
 		gl.useProgram(computeProgram)
 		// for (var i = 256; i--;)
-		if (z++ % 10 == 0)
-			gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
+		//if (z++ % 100 == 0)
+		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
 		gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(renderProgram)
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 8)
