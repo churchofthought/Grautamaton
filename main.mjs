@@ -21,20 +21,11 @@ window.onload = async () => {
 
 	setupBlitting(gl, renderProgram)
 
-
-	const safeMod = (x, y) => Math.floor((x + y) % y)
 	const mousePosToArr = (x, y) => {
 
-		//console.log(x,y)
-
-		const centeredX = x - constants.CANVAS_WIDTH / 2
-		const centeredY = constants.CANVAS_HEIGHT / 2 - y
-
-		const u = safeMod(2.0 / 3.0 * centeredX, constants.UNIVERSE_WIDTH)
-		const v = safeMod(-1.0 / 3.0 * centeredX + Math.sqrt(3.0) / 3.0 * centeredY, constants.UNIVERSE_HEIGHT)
-
-
-		//console.log(u,v)
+		const u = util.mod((x / constants.CANVAS_WIDTH), 1.0) * constants.UNIVERSE_WIDTH
+		const v = util.mod(1.0 - y / constants.CANVAS_HEIGHT, 1.0) * constants.UNIVERSE_HEIGHT
+		
 		return u * constants.UNIVERSE_HEIGHT + v
 	}
 
@@ -44,9 +35,9 @@ window.onload = async () => {
 
 		const arr = new Uint8Array(constants.UNIVERSE_BYTE_SIZE)
 
-		// for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
-		// 	arr[i] = Math.floor(Math.random() * 256)
-		// }
+		for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
+			arr[i] = Math.floor(Math.random() * 256)
+		}
 
 		//arr[constants.UNIVERSE_SIZE - 1] = 20000
 		// for (var x = 0; x < constants.UNIVERSE_WIDTH; x++)
@@ -82,7 +73,7 @@ window.onload = async () => {
 		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
 		gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(renderProgram)
-		gl.drawArrays(gl.TRIANGLE_FAN, 0, 8)
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 		requestAnimationFrame(render)
 	}
 
@@ -94,30 +85,30 @@ window.onload = async () => {
 		({offsetX, offsetY} = event)
 	}
 	const mousedownHandler = () => {
-		const offset = 2 * mousePosToArr(offsetX, offsetY)
-		const byteOffset = Math.floor(offset / 8)
+		const offset = constants.CELL_BITS * mousePosToArr(offsetX, offsetY)
+		const byteOffset = offset / 8
 		const bitOffset = offset % 8
 		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
 
-		const orig = (universeView[0] & (3 << bitOffset)) >> bitOffset
+		const orig = (universeView[0] & ((constants.NUM_STATES - 1) << bitOffset)) >> bitOffset
 		// right click
 		if (button == 2){
 			universeView[0] &= ~(3 << bitOffset)
-			universeView[0] |= util.mod(orig - 1, constants.CELL_STATES) << bitOffset
+			universeView[0] |= util.mod(orig - 1, constants.NUM_STATES) << bitOffset
 		// left click
 		}else if (button == 0){
-			universeView[0] &= ~(3 << bitOffset)
-			universeView[0] |= util.mod(orig + 1, constants.CELL_STATES) << bitOffset
+			universeView[0] &= ~((constants.NUM_STATES - 1) << bitOffset)
+			universeView[0] |= util.mod(orig + 1, constants.NUM_STATES) << bitOffset
 		}else{
 			// middle click
-			universeView[0] &= ~(3 << bitOffset)
-			universeView[0] |= (constants.CELL_STATES - orig) << bitOffset
+			universeView[0] &= ~((constants.NUM_STATES - 1) << bitOffset)
+			universeView[0] |= (constants.NUM_STATES - orig) << bitOffset
 		}
 		
 		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
 	}
 	var mousedownInterval = 0
-	canvas.onmousemove = updateMouse
+	window.onmousemove = updateMouse
 	canvas.oncontextmenu = e => e.preventDefault()
 	canvas.onmousedown = e => {
 		({button, offsetX, offsetY} = e)

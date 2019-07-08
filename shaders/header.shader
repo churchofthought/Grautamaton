@@ -5,9 +5,9 @@ ${constants.cDefines}
 #define GREEN uint(2)
 #define BLUE uint(3)
 
-#define GET_CELL(dir, index) ((universe[dir].cells[index.x] & (uint(3) << index.y)) >> index.y)
+#define GET_CELL(dir, index) ((universe[dir].cells[index.x] & (uint(NUM_STATES - 1) << index.y)) >> index.y)
 #define SET_CELL(dir, index, val) \
-	atomicAnd(universe[dir].cells[index.x], ~(uint(3) << index.y)); \
+	atomicAnd(universe[dir].cells[index.x], ~(uint(NUM_STATES - 1) << index.y)); \
 	atomicOr(universe[dir].cells[index.x], val << index.y);
 
 #define COUNT(neighborhood, val) ( \
@@ -16,7 +16,9 @@ ${constants.cDefines}
   (neighborhood[2] == val ? uint(1) : uint(0)) + \
   (neighborhood[3] == val ? uint(1) : uint(0)) + \
   (neighborhood[4] == val ? uint(1) : uint(0)) + \
-  (neighborhood[5] == val ? uint(1) : uint(0)) \
+  (neighborhood[5] == val ? uint(1) : uint(0)) + \
+  (neighborhood[6] == val ? uint(1) : uint(0)) + \
+  (neighborhood[7] == val ? uint(1) : uint(0)) \
 )
 
 
@@ -28,13 +30,16 @@ precision highp int;
 
 
 layout(std430, binding = 0) coherent restrict ${type == "FRAGMENT" ? "readonly" : ""} buffer UniverseBufferData {
-	uint[UNIVERSE_BYTE_SIZE / 4] cells;
+	uint[UNIVERSE_INT_SIZE] cells;
 } universe[2];
 
 
 
 uvec2 idx(uint x, uint y){
-	uint index = uint(2) * ((x % uint(UNIVERSE_WIDTH)) * uint(UNIVERSE_HEIGHT) + (y % uint(UNIVERSE_HEIGHT)));
+	x = (x + uint(UNIVERSE_WIDTH)) % uint(UNIVERSE_WIDTH);
+	y = (y + uint(UNIVERSE_HEIGHT)) % uint(UNIVERSE_HEIGHT);
+
+	uint index = uint(CELL_BITS) * (x * uint(UNIVERSE_HEIGHT) + y);
 
 	uint intIndex = index / uint(32);
 	uint bitIndex = index - (intIndex * uint(32));
@@ -44,7 +49,7 @@ uvec2 idx(uint x, uint y){
 
 
 
-vec4 colors[4] = vec4[](
+vec4 colors[NUM_STATES] = vec4[](
 	vec4(0.0,0.0,0.0,1.0),
 	vec4(1.0,0.0,0.0,1.0),
 	vec4(0.0,1.0,0.0,1.0),
