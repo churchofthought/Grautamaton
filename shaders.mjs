@@ -12,11 +12,11 @@ export default async gl => {
 	const shaderSources = Object.fromEntries(await Promise.all([
 		"vertex", "fragment", "compute"
 	].map(getShaderFile)))
-	const lined = (s) => s.split(/[\r\n]+/).map((x, i) => `${i}. ${x}`).join("\n")
-
-	console.log(
-		lined(shaderSources.fragment) + "\n=====================================\n" + lined(shaderSources.compute)
-	)
+	
+	// const lined = (s) => s.split(/[\r\n]+/).map((x, i) => `${i}. ${x}`).join("\n")
+	// console.log(
+	// 	lined(shaderSources.fragment) + "\n=====================================\n" + lined(shaderSources.compute)
+	// )
 
 	const createShader = (program, sourceCode, type) => {
 		// Compiles either a shader of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER

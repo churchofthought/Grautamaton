@@ -3,14 +3,52 @@ import setupBlitting from "./blitting.mjs"
 import constants from "./constants.mjs"
 import util from "./util.js"
 
-
+// window.onresize = () => {
+	
+// }
 
 window.onload = async () => {
-	const canvas = document.querySelector("#glCanvas")
+	
+	const container = document.createElement("div")
+
+	const canvas = document.createElement("canvas")
 	canvas.width = constants.CANVAS_WIDTH
 	canvas.height = constants.CANVAS_HEIGHT
-	const gl = canvas.getContext("webgl2-compute")
+	
 
+	const status = document.createElement("div")
+	
+	// set styles
+	document.documentElement.style = document.body.style = `
+		padding: 0;
+		margin: 0;
+		text-align: center;
+	`
+
+	container.style = `
+		display:inline-block;
+		position: relative;
+		margin-left: auto;
+		margin-right: auto;
+	`
+
+	status.style = `
+		position: absolute;
+		left: 0;
+		top: 0;
+		margin: 0.5em;
+		z-index: 1;
+		color: red;
+		font-family: monospace;
+		font-weight: bold;
+		font-size: 1em;
+	`
+
+	container.appendChild(canvas)
+	container.appendChild(status)
+	document.body.appendChild(container)
+
+	const gl = canvas.getContext("webgl2-compute")
 	// Only continue if WebGL is available and working
 	if (!gl)
 		throw "Unable to initialize WebGL2 Compute. Your browser or machine may not support it."
@@ -52,30 +90,32 @@ window.onload = async () => {
 		// 	arr[i] = Math.floor(Math.random() * 256)
 		// }
 
-		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr, gl.STATIC_DRAW)
+		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr, gl.DYNAMIC_COPY)
 		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, idx, buffer)
 	}
 
-	// const bindRenderMeta = () => {
-	// 	const buffer = gl.createBuffer()
-	// 	gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
-	// 	gl.bufferData(gl.SHADER_STORAGE_BUFFER, new Uint8Array([0]), gl.STATIC_DRAW)
-	// 	gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, 2, buffer)
-	// }
+	const bindRenderMeta = () => {
+		const buffer = gl.createBuffer()
+		gl.bindBuffer(gl.UNIFORM_BUFFER, buffer)
+		gl.bufferData(gl.UNIFORM_BUFFER, 16, gl.DYNAMIC_DRAW)
+		gl.bindBufferBase(gl.UNIFORM_BUFFER, 2, buffer)
+		//gl.bindBufferRange(gl.UNIFORM_BUFFER, 2, buffer, 0, 16)
+		for (const x of [computeProgram, renderProgram])
+			gl.uniformBlockBinding(x, 0, 2)
+	}
 
 
-	// bindRenderMeta();
+	bindRenderMeta();
 	[1, 0].forEach(bindUniverse)
 
-	var z = 0
+	var time = new Uint8Array([0])
+	var startTime = Date.now()
 	const render = () => {
-		// slow down computation
-		if (z++ % 10 == 0){
-			gl.useProgram(computeProgram)
-			// for (var i = 256; i--;)
-			gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
-			gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
-		}
+		status.textContent = `${(1000 * ++time[0] / (Date.now() - startTime)).toFixed(2)} fps`
+		gl.bufferSubData(gl.UNIFORM_BUFFER, 0, time)
+		gl.useProgram(computeProgram)
+		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
+		gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(renderProgram)
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 		requestAnimationFrame(render)

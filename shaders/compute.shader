@@ -49,9 +49,9 @@ void main(void){
     idx(x+uint(1),y),
     idx(x+uint(1),y+uint(1))
   );
-
-  TRANSITION(0);
-  memoryBarrierBuffer();
-  barrier();
-  TRANSITION(1);
+  if ((time & uint(1)) == uint(1)){
+    TRANSITION(1);
+  }else{
+    TRANSITION(0);
+  }
 }

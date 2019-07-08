@@ -12,5 +12,9 @@ void main(void) {
 	
 	uvec2 index = idx(absCoords.x, absCoords.y);
 	
-	fragColor = colors[GET_CELL(0, index)];
+	if ((time & uint(1)) == uint(1)){
+		fragColor = colors[GET_CELL(1, index)];
+	}else{
+		fragColor = colors[GET_CELL(0, index)];
+	}
 }

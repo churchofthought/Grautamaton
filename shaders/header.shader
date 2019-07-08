@@ -33,6 +33,10 @@ layout(std430, binding = 0) coherent restrict ${type == "FRAGMENT" ? "readonly" 
 	uint[UNIVERSE_INT_SIZE] cells;
 } universe[2];
 
+layout(std140) uniform meta {
+	uint time;
+};
+
 
 
 uvec2 idx(uint x, uint y){
