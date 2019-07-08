@@ -1,8 +1,8 @@
 const logb = (n, base) => Math.log(n) / Math.log(base)
 
 const c = {}
-c.CANVAS_WIDTH = 2048
-c.CANVAS_HEIGHT = 2048
+c.CANVAS_WIDTH = 1024
+c.CANVAS_HEIGHT = 1024
 
 c.UNIVERSE_WIDTH = c.CANVAS_WIDTH
 c.UNIVERSE_HEIGHT = c.CANVAS_HEIGHT
