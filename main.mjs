@@ -115,7 +115,7 @@ window.onload = async () => {
 		gl.bufferSubData(gl.UNIFORM_BUFFER, 0, time)
 		gl.useProgram(computeProgram)
 		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
-		gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
+		// gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(renderProgram)
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 		requestAnimationFrame(render)
