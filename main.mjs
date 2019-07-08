@@ -35,9 +35,9 @@ window.onload = async () => {
 
 		const arr = new Uint8Array(constants.UNIVERSE_BYTE_SIZE)
 
-		for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
-			arr[i] = Math.floor(Math.random() * 256)
-		}
+		// for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
+		// 	arr[i] = Math.floor(Math.random() * 256)
+		// }
 
 		//arr[constants.UNIVERSE_SIZE - 1] = 20000
 		// for (var x = 0; x < constants.UNIVERSE_WIDTH; x++)
@@ -65,13 +65,15 @@ window.onload = async () => {
 	// bindRenderMeta();
 	[1, 0].forEach(bindUniverse)
 
-	//var z = 0
+	var z = 0
 	const render = () => {
-		gl.useProgram(computeProgram)
-		// for (var i = 256; i--;)
-		//if (z++ % 100 == 0)
-		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
-		gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
+		// slow down computation
+		if (z++ % 10 == 0){
+			gl.useProgram(computeProgram)
+			// for (var i = 256; i--;)
+			gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
+			gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
+		}
 		gl.useProgram(renderProgram)
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 		requestAnimationFrame(render)

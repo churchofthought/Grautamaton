@@ -21,22 +21,16 @@ SET_CELL(dir ^ 1, C, \
 );
 
 uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
-uint sum = 
-  neighborhood[0] % uint(2) + 
-  neighborhood[1] % uint(2) +
-  neighborhood[2] % uint(2) +
-  neighborhood[3] % uint(2) +
-  neighborhood[4] % uint(2) +
-  neighborhood[5] % uint(2) +
-  neighborhood[6] % uint(2) +
-  neighborhood[7] % uint(2);
-  if (sum == uint(3)) {
-      return RED;
-  } else if (sum == uint(2)) {
-      return center % uint(2);
-  } else {
-      return BLACK;
-  }
+  if (center == BLUE)
+    return RED;
+  if (COUNT(neighborhood, BLUE) >= uint(1) && center == BLACK)
+    return BLUE;
+  if (center == BLUE)
+    return BLACK;
+  if (center == RED)
+    return BLACK;
+
+  return BLACK;
 }
 
 void main(void){
@@ -57,7 +51,7 @@ void main(void){
   );
 
   TRANSITION(0);
-  barrier();
   memoryBarrierBuffer();
+  barrier();
   TRANSITION(1);
 }
