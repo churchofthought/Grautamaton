@@ -7,6 +7,8 @@ import util from "./util.js"
 
 window.onload = async () => {
 	const canvas = document.querySelector("#glCanvas")
+	canvas.width = constants.CANVAS_WIDTH
+	canvas.height = constants.CANVAS_HEIGHT
 	const gl = canvas.getContext("webgl2-compute")
 
 	// Only continue if WebGL is available and working
