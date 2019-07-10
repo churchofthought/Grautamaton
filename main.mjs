@@ -1,7 +1,7 @@
 import createPrograms from "./shaders.mjs"
 import setupBlitting from "./blitting.mjs"
 import constants from "./constants.mjs"
-import util from "./util.js"
+import util from "./util.mjs"
 
 // window.onresize = () => {
 	

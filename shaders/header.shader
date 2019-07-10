@@ -1,4 +1,4 @@
-${constants.cDefines}
+${c.cDefines}
 
 #define BLACK uint(0)
 #define RED uint(1)
@@ -6,20 +6,12 @@ ${constants.cDefines}
 #define BLUE uint(3)
 
 #define GET_CELL(dir, index) ((universe[dir].cells[index.x] & (uint(NUM_STATES - 1) << index.y)) >> index.y)
+
 #define SET_CELL(dir, index, val) \
 	atomicAnd(universe[dir].cells[index.x], ~(uint(NUM_STATES - 1) << index.y)); \
 	atomicOr(universe[dir].cells[index.x], val << index.y);
 
-#define COUNT(neighborhood, val) ( \
-  (neighborhood[0] == val ? uint(1) : uint(0)) + \
-  (neighborhood[1] == val ? uint(1) : uint(0)) + \
-  (neighborhood[2] == val ? uint(1) : uint(0)) + \
-  (neighborhood[3] == val ? uint(1) : uint(0)) + \
-  (neighborhood[4] == val ? uint(1) : uint(0)) + \
-  (neighborhood[5] == val ? uint(1) : uint(0)) + \
-  (neighborhood[6] == val ? uint(1) : uint(0)) + \
-  (neighborhood[7] == val ? uint(1) : uint(0)) \
-)
+#define COUNT(neighborhood, val) (${u.repeat(c.NUM_NEIGHBORS, i => `(neighborhood[${i}] == val ? uint(1) : uint(0))`, '+')})
 
 
 
@@ -37,13 +29,8 @@ layout(std140) uniform meta {
 	uint time;
 };
 
-
-
 uvec2 idx(uint x, uint y){
-	x = (x + uint(UNIVERSE_WIDTH)) % uint(UNIVERSE_WIDTH);
-	y = (y + uint(UNIVERSE_HEIGHT)) % uint(UNIVERSE_HEIGHT);
-
-	uint index = uint(CELL_BITS) * (x * uint(UNIVERSE_HEIGHT) + y);
+	uint index = uint(CELL_BITS) * ((x % uint(UNIVERSE_WIDTH)) * uint(UNIVERSE_HEIGHT) + (y % uint(UNIVERSE_HEIGHT)));
 
 	uint intIndex = index / uint(32);
 	uint bitIndex = index - (intIndex * uint(32));
