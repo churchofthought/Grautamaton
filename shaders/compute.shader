@@ -11,15 +11,18 @@ layout( local_size_x = 1 ) in;
 ));
 
 uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
-  if (center == BLUE)
-    return RED;
-  if (COUNT(neighborhood, BLUE) >= uint(1) && center == BLACK)
-    return BLUE;
-  if (center == BLUE)
-    return BLACK;
   if (center == RED)
     return BLACK;
+  if (center == BLUE)
+    return RED;
 
+  uint bn = COUNT(neighborhood, BLUE);
+  if (bn >= 1u && bn <= 3u && center == BLACK)
+    return BLUE;
+  // if (center == GREEN)
+  //   return RED;
+  // if (COUNT(neighborhood, GREEN) >= 1u && center == BLACK)
+  //   return GREEN;	
   return BLACK;
 }
 
@@ -31,7 +34,7 @@ void main(void){
   uvec2[NUM_NEIGHBORS] idxes = uvec2[](
     ${u.repeat(u.moore, ([x,y]) => `idx(x+uint(${x}),y+uint(${y}))`, ',')}
   );
-  if ((time & uint(1)) == uint(1)){
+  if ((time & 1u) == 1u){
     TRANSITION(1);
   }else{
     TRANSITION(0);

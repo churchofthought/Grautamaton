@@ -1,9 +1,9 @@
 ${c.cDefines}
 
-#define BLACK uint(0)
-#define RED uint(1)
-#define GREEN uint(2)
-#define BLUE uint(3)
+#define BLACK 0u
+#define RED 1u
+#define GREEN 2u
+#define BLUE 3u
 
 #define GET_CELL(dir, index) ((universe[dir].cells[index.x] & (uint(NUM_STATES - 1) << index.y)) >> index.y)
 
@@ -11,7 +11,7 @@ ${c.cDefines}
 	atomicAnd(universe[dir].cells[index.x], ~(uint(NUM_STATES - 1) << index.y)); \
 	atomicOr(universe[dir].cells[index.x], val << index.y);
 
-#define COUNT(neighborhood, val) (${u.repeat(c.NUM_NEIGHBORS, i => `(neighborhood[${i}] == val ? uint(1) : uint(0))`, '+')})
+#define COUNT(neighborhood, val) (${u.repeat(c.NUM_NEIGHBORS, i => `(neighborhood[${i}] == val ? 1u : 0u)`, '+')})
 
 
 
@@ -32,8 +32,8 @@ layout(std140) uniform meta {
 uvec2 idx(uint x, uint y){
 	uint index = uint(CELL_BITS) * ((x % uint(UNIVERSE_WIDTH)) * uint(UNIVERSE_HEIGHT) + (y % uint(UNIVERSE_HEIGHT)));
 
-	uint intIndex = index / uint(32);
-	uint bitIndex = index - (intIndex * uint(32));
+	uint intIndex = index / 32u;
+	uint bitIndex = index - (intIndex * 32u);
 
 	return uvec2(intIndex, bitIndex);
 }
