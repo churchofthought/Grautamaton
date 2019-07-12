@@ -4,20 +4,20 @@ import constants from "./constants.mjs"
 import util from "./util.mjs"
 
 // window.onresize = () => {
-	
+
 // }
 
 window.onload = async () => {
-	
+
 	const container = document.createElement("div")
 
 	const canvas = document.createElement("canvas")
 	canvas.width = constants.CANVAS_WIDTH
 	canvas.height = constants.CANVAS_HEIGHT
-	
+
 
 	const status = document.createElement("div")
-	
+
 	// set styles
 	document.documentElement.style = document.body.style = `
 		padding: 0;
@@ -61,11 +61,13 @@ window.onload = async () => {
 
 	setupBlitting(gl, renderProgram)
 
-	const mousePosToArr = (x, y) => {
+	const projector = util.projectors[constants.NEIGHBORHOOD]
+	const mousePosToArr = (rawX, rawY) => {
+		const [x, y] = projector(rawX, rawY)
 
 		const u = util.mod((x / constants.CANVAS_WIDTH), 1.0) * constants.UNIVERSE_WIDTH
 		const v = util.mod(1.0 - y / constants.CANVAS_HEIGHT, 1.0) * constants.UNIVERSE_HEIGHT
-		
+
 		return u * constants.UNIVERSE_HEIGHT + v
 	}
 
@@ -84,8 +86,8 @@ window.onload = async () => {
 		// 	for (var y = 0; y < constants.UNIVERSE_HEIGHT; y++)
 		// 		arr[x * constants.UNIVERSE_HEIGHT + y] = -1.0
 
-		//arr[0] = 1
-		
+		// arr[0] = 3
+
 		// for (var i = Math.floor(constants.UNIVERSE_SIZE / 8 / 10); i--;){
 		// 	arr[i] = Math.floor(Math.random() * 256)
 		// }
@@ -108,25 +110,38 @@ window.onload = async () => {
 	bindRenderMeta();
 	[1, 0].forEach(bindUniverse)
 
-	var time = new Uint8Array([0])
-	var startTime = Date.now()
+	var time = new Uint32Array([0])
+	var startTime = Date.now() / 1000
+	const blit = (() => {
+		switch (constants.NEIGHBORHOOD){
+		case "moore":
+			return () => {
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+			}
+			
+		case "hex":
+			return () => {
+				gl.drawArrays(gl.TRIANGLE_FAN, 0, 8)
+			}
+		}
+	})()
 	const render = () => {
-		status.textContent = `${(1000 * ++time[0] / (Date.now() - startTime)).toFixed(2)} fps`
+		status.textContent = `${(++time[0] / (Date.now() / 1000 - startTime)).toFixed(2)} fps`
 		gl.bufferSubData(gl.UNIFORM_BUFFER, 0, time)
+		// gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(computeProgram)
 		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
-		// gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
 		gl.useProgram(renderProgram)
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+		blit()
 		requestAnimationFrame(render)
 	}
 
 	render()
 
 	const universeView = new Uint8Array(1)
-	var offsetX, offsetY, button
+	var offsetX, offsetY, shiftKey, button
 	const updateMouse = event => {
-		({offsetX, offsetY} = event)
+		({shiftKey, offsetX, offsetY } = event)
 	}
 	const mousedownHandler = () => {
 		const offset = constants.CELL_BITS * mousePosToArr(offsetX, offsetY)
@@ -135,27 +150,40 @@ window.onload = async () => {
 		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
 
 		const orig = (universeView[0] & ((constants.NUM_STATES - 1) << bitOffset)) >> bitOffset
-		// right click
-		if (button == 2){
-			universeView[0] &= ~(3 << bitOffset)
-			universeView[0] |= util.mod(orig - 1, constants.NUM_STATES) << bitOffset
-		// left click
-		}else if (button == 0){
-			universeView[0] &= ~((constants.NUM_STATES - 1) << bitOffset)
-			universeView[0] |= util.mod(orig + 1, constants.NUM_STATES) << bitOffset
-		}else{
+
+		//clear current value 
+		universeView[0] &= ~((constants.NUM_STATES - 1) << bitOffset)
+
+		const newVal = (() => {
+			switch (button) {
+
+			// left click
+			case 0:
+				return 3
+
+			// right click
+			case 1:
+				return 2
+	
 			// middle click
-			universeView[0] &= ~((constants.NUM_STATES - 1) << bitOffset)
-			universeView[0] |= (constants.NUM_STATES - orig) << bitOffset
-		}
-		
+			case 2:
+				return 1
+
+			// ????
+			default:
+				return 0
+			}
+		})()
+
+		universeView[0] |= util.mod(shiftKey ? orig - newVal : newVal, constants.NUM_STATES) << bitOffset
+
 		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
 	}
 	var mousedownInterval = 0
 	window.onmousemove = updateMouse
 	canvas.oncontextmenu = e => e.preventDefault()
 	canvas.onmousedown = e => {
-		({button, offsetX, offsetY} = e)
+		({ button, offsetX, offsetY } = e)
 		if (mousedownInterval) clearInterval(mousedownInterval)
 		mousedownInterval = setInterval(mousedownHandler, 0)
 		e.preventDefault()
