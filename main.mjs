@@ -42,6 +42,7 @@ window.onload = async () => {
 		font-family: monospace;
 		font-weight: bold;
 		font-size: 1em;
+		pointer-events: none;
 	`
 
 	container.appendChild(canvas)
@@ -60,13 +61,13 @@ window.onload = async () => {
 	const { renderProgram, computeProgram } = await createPrograms(gl)
 
 	setupBlitting(gl, renderProgram)
-
-	const projector = util.projectors[constants.NEIGHBORHOOD]
-	const mousePosToArr = (rawX, rawY) => {
-		const [x, y] = projector(rawX, rawY)
-
-		const u = util.mod((x / constants.CANVAS_WIDTH), 1.0) * constants.UNIVERSE_WIDTH
-		const v = util.mod(1.0 - y / constants.CANVAS_HEIGHT, 1.0) * constants.UNIVERSE_HEIGHT
+	const mousePosToArr = (x, y) => {
+		[x, y] = constants.PROJECTOR(
+			x / constants.CANVAS_WIDTH, 
+			1.0 - y / constants.CANVAS_HEIGHT
+		)
+		const u = util.mod(x * constants.UNIVERSE_WIDTH, constants.UNIVERSE_WIDTH)
+		const v = util.mod(y * constants.UNIVERSE_HEIGHT, constants.UNIVERSE_HEIGHT)
 
 		return u * constants.UNIVERSE_HEIGHT + v
 	}
@@ -86,7 +87,7 @@ window.onload = async () => {
 		// 	for (var y = 0; y < constants.UNIVERSE_HEIGHT; y++)
 		// 		arr[x * constants.UNIVERSE_HEIGHT + y] = -1.0
 
-		// arr[0] = 3
+		//arr[0] = 1
 
 		// for (var i = Math.floor(constants.UNIVERSE_SIZE / 8 / 10); i--;){
 		// 	arr[i] = Math.floor(Math.random() * 256)
@@ -112,27 +113,17 @@ window.onload = async () => {
 
 	var time = new Uint32Array([0])
 	var startTime = Date.now() / 1000
-	const blit = (() => {
-		switch (constants.NEIGHBORHOOD){
-		case "moore":
-			return () => {
-				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-			}
-			
-		case "hex":
-			return () => {
-				gl.drawArrays(gl.TRIANGLE_FAN, 0, 8)
-			}
-		}
-	})()
+
 	const render = () => {
 		status.textContent = `${(++time[0] / (Date.now() / 1000 - startTime)).toFixed(2)} fps`
 		gl.bufferSubData(gl.UNIFORM_BUFFER, 0, time)
-		// gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
+		//gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
+		
 		gl.useProgram(computeProgram)
 		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
+		
 		gl.useProgram(renderProgram)
-		blit()
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 		requestAnimationFrame(render)
 	}
 
@@ -142,6 +133,15 @@ window.onload = async () => {
 	var offsetX, offsetY, shiftKey, button
 	const updateMouse = event => {
 		({shiftKey, offsetX, offsetY } = event)
+		// console.log(offsetX, offsetY)
+		// const [x,y] = constants.PROJECTOR(
+		// 	(offsetX / constants.CANVAS_WIDTH) - 0.5, 
+		// 	0.5 - (offsetY / constants.CANVAS_HEIGHT)
+		// )
+		// console.log("projection", x, y)
+		// const u = util.mod(x * constants.UNIVERSE_WIDTH, constants.UNIVERSE_WIDTH)
+		// const v = util.mod(y * constants.UNIVERSE_HEIGHT, constants.UNIVERSE_HEIGHT)
+		// console.log("actual", u, v)
 	}
 	const mousedownHandler = () => {
 		const offset = constants.CELL_BITS * mousePosToArr(offsetX, offsetY)
@@ -180,7 +180,7 @@ window.onload = async () => {
 		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
 	}
 	var mousedownInterval = 0
-	window.onmousemove = updateMouse
+	canvas.onmousemove = updateMouse
 	canvas.oncontextmenu = e => e.preventDefault()
 	canvas.onmousedown = e => {
 		({ button, offsetX, offsetY } = e)

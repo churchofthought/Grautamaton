@@ -29,8 +29,13 @@ layout(std140) uniform meta {
 	uint time;
 };
 
-uvec2 idx(uint x, uint y){
-	uint index = uint(CELL_BITS) * ((x % uint(UNIVERSE_WIDTH)) * uint(UNIVERSE_HEIGHT) + (y % uint(UNIVERSE_HEIGHT)));
+uint safeMod(int x, int y) {
+	int m = x % y;
+	return uint(m >= 0 ? m : (y + m));
+}
+
+uvec2 idx(int x, int y){
+	uint index = uint(CELL_BITS) * (safeMod(x, UNIVERSE_WIDTH) * uint(UNIVERSE_HEIGHT) + safeMod(y, UNIVERSE_HEIGHT));
 
 	uint intIndex = index / 32u;
 	uint bitIndex = index - (intIndex * 32u);
@@ -41,7 +46,7 @@ uvec2 idx(uint x, uint y){
 
 
 vec4 colors[NUM_STATES] = vec4[](
-	vec4(1.0,1.0,1.0,1.0),
+	vec4(0.0,0.0,0.0,1.0),
 	vec4(1.0,0.0,0.0,1.0),
 	vec4(0.0,1.0,0.0,1.0),
 	vec4(0.0,0.0,1.0,1.0)

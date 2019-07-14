@@ -11,36 +11,36 @@ layout( local_size_x = 1 ) in;
 ));
 
 uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
-  uint blue = COUNT(neighborhood, BLUE);
   uint red = COUNT(neighborhood, RED);
-  uint green = COUNT(neighborhood, GREEN);
-  uint black = COUNT(neighborhood, BLACK);
+  // uint red = COUNT(neighborhood, RED);
+  // uint green = COUNT(neighborhood, GREEN);
+  // uint black = COUNT(neighborhood, BLACK);
   
-  if (center == GREEN && red >= 1u)
-    return BLACK;
+  // if (center == GREEN && red >= 1u)
+  //   return BLACK;
 
-  if (center == BLUE && green >= 1u)
-    return BLACK;
+  // if (center == BLUE && green >= 1u)
+  //   return BLACK;
 
-  if (center == GREEN)
-    return BLUE;
+  // if (center == GREEN)
+  //   return BLUE;
 
    
 
-  if (center == BLUE)
+  // if (center == BLUE)
+  //   return RED;
+  
+  // if (center == RED)
+  //   return BLACK;
+
+  // if (red >= 1u || green >= 1u)
+  //   return BLACK;
+
+  // if (blue >= 5u)
+  //   return GREEN;
+  
+  if (red >= 1u)
     return RED;
-  
-  if (center == RED)
-    return BLACK;
-
-  if (red >= 1u || green >= 1u)
-    return BLACK;
-
-  if (blue >= 5u)
-    return GREEN;
-  
-  if (blue >= 1u)
-    return BLUE;
 
 
    
@@ -52,12 +52,12 @@ uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
 }
 
 void main(void){
-  uint x = gl_GlobalInvocationID.x;
-  uint y = gl_GlobalInvocationID.y;
+  int x = int(gl_GlobalInvocationID.x);
+  int y = int(gl_GlobalInvocationID.y);
 
   uvec2 C = idx(x, y);
   uvec2[NUM_NEIGHBORS] idxes = uvec2[](
-    ${u.repeat(u.neighborhoods[c.NEIGHBORHOOD](), ([x,y]) => `idx(x+uint(${x}),y+uint(${y}))`, ',')}
+    ${u.repeat(c.NEIGHBORHOOD, ([x,y]) => `idx(x${(x >= 0 ? "+" : "") + x},y${(y >= 0 ? "+" : "") + y})`, ',')}
   );
   if ((time & 1u) == 1u){
     TRANSITION(1);
