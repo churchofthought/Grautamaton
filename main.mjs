@@ -61,17 +61,6 @@ window.onload = async () => {
 	const { renderProgram, computeProgram } = await createPrograms(gl)
 
 	setupBlitting(gl, renderProgram)
-	const mousePosToArr = (x, y) => {
-		[x, y] = constants.PROJECTOR(
-			x / constants.CANVAS_WIDTH, 
-			1.0 - y / constants.CANVAS_HEIGHT
-		)
-		const u = util.mod(x * constants.UNIVERSE_WIDTH, constants.UNIVERSE_WIDTH)
-		const v = util.mod(y * constants.UNIVERSE_HEIGHT, constants.UNIVERSE_HEIGHT)
-
-		return u * constants.UNIVERSE_HEIGHT + v
-	}
-
 	const bindUniverse = idx => {
 		const buffer = gl.createBuffer()
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
@@ -131,20 +120,24 @@ window.onload = async () => {
 
 	const universeView = new Uint8Array(1)
 	var offsetX, offsetY, shiftKey, button
+	
 	const updateMouse = event => {
 		({shiftKey, offsetX, offsetY } = event)
-		// console.log(offsetX, offsetY)
-		// const [x,y] = constants.PROJECTOR(
-		// 	(offsetX / constants.CANVAS_WIDTH) - 0.5, 
-		// 	0.5 - (offsetY / constants.CANVAS_HEIGHT)
-		// )
-		// console.log("projection", x, y)
-		// const u = util.mod(x * constants.UNIVERSE_WIDTH, constants.UNIVERSE_WIDTH)
-		// const v = util.mod(y * constants.UNIVERSE_HEIGHT, constants.UNIVERSE_HEIGHT)
-		// console.log("actual", u, v)
 	}
+	const mousePosToArr = () => {
+		const [x, y] = constants.PROJECTOR(
+			offsetX, 
+			constants.CANVAS_HEIGHT - offsetY
+		)
+
+		const u = util.mod(x, constants.UNIVERSE_WIDTH)
+		const v = util.mod(y, constants.UNIVERSE_HEIGHT)
+		
+		return u * constants.UNIVERSE_HEIGHT + v
+	}
+
 	const mousedownHandler = () => {
-		const offset = constants.CELL_BITS * mousePosToArr(offsetX, offsetY)
+		const offset = constants.CELL_BITS * mousePosToArr()
 		const byteOffset = offset / 8
 		const bitOffset = offset % 8
 		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)

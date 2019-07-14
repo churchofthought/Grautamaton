@@ -17,18 +17,26 @@ c.NUM_NEIGHBORS = c.NEIGHBORHOOD.length
 const projector = (() => {
 	switch (c.NEIGHBORHOOD_TYPE) {
 	case "hex":
-		return (x,y) => [x,y]
+		return (x,y) => [
+			x * 2.0/3.0,
+			x * -1.0/3.0 + y * 1.0/Math.sqrt(3.0)
+		]
 	default:
 		return (x,y) => [x,y]
 	}
 })()
 Object.defineProperty(c, "PROJECTOR", { value: projector, enumerable: false })
 
-c.CANVAS_WIDTH = 1024 
-c.CANVAS_HEIGHT = 768
 
-c.UNIVERSE_WIDTH = c.CANVAS_WIDTH
-c.UNIVERSE_HEIGHT = c.CANVAS_HEIGHT
+c.CANVAS_WIDTH = 1920 
+c.CANVAS_HEIGHT = 1080
+
+
+// use projector to scale the universe to minimum size
+const t1 = projector(c.CANVAS_WIDTH, 0)
+const t2 = projector(0, c.CANVAS_HEIGHT)
+c.UNIVERSE_WIDTH = Math.floor(t1[0])
+c.UNIVERSE_HEIGHT = Math.floor(t2[1])
 
 
 

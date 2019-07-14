@@ -51,13 +51,14 @@ uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
   return BLACK;
 }
 
+
 void main(void){
-  int x = int(gl_GlobalInvocationID.x);
-  int y = int(gl_GlobalInvocationID.y);
+  uint x = gl_GlobalInvocationID.x;
+  uint y = gl_GlobalInvocationID.y;
 
   uvec2 C = idx(x, y);
   uvec2[NUM_NEIGHBORS] idxes = uvec2[](
-    ${u.repeat(c.NEIGHBORHOOD, ([x,y]) => `idx(x${(x >= 0 ? "+" : "") + x},y${(y >= 0 ? "+" : "") + y})`, ',')}
+    ${u.repeat(c.NEIGHBORHOOD, ([x,y]) => `idx(omod(x,${x},uint(UNIVERSE_WIDTH)),omod(y,${y},uint(UNIVERSE_HEIGHT)))`, ',')}
   );
   if ((time & 1u) == 1u){
     TRANSITION(1);
