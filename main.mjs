@@ -66,7 +66,7 @@ window.onload = async () => {
 		const buffer = gl.createBuffer()
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
 
-		const arr = new Uint8Array(constants.UNIVERSE_BYTE_SIZE)
+		// const arr = new Uint8Array(constants.UNIVERSE_BYTE_SIZE)
 
 		// for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
 		// 	arr[i] = Math.floor(Math.random() * 256)
@@ -83,7 +83,7 @@ window.onload = async () => {
 		// 	arr[i] = Math.floor(Math.random() * 256)
 		// }
 
-		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr, gl.DYNAMIC_COPY)
+		gl.bufferData(gl.SHADER_STORAGE_BUFFER, /*arr*/ constants.UNIVERSE_BYTE_SIZE, gl.DYNAMIC_COPY)
 		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, idx, buffer)
 	}
 
@@ -107,13 +107,14 @@ window.onload = async () => {
 	const render = () => {
 		status.textContent = `${(++time[0] / (Date.now() / 1000 - startTime)).toFixed(2)} fps`
 		gl.bufferSubData(gl.UNIFORM_BUFFER, 0, time)
-		//gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT)
+		//gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT);
+
+		gl.useProgram(renderProgram)
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 		
 		gl.useProgram(computeProgram)
 		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
 		
-		gl.useProgram(renderProgram)
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 		requestAnimationFrame(render)
 	}
 

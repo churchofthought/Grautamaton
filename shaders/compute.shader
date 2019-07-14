@@ -4,7 +4,7 @@ ${HEADER_INCLUDE("COMPUTE")}
 layout( local_size_x = 1 ) in;
 
 #define TRANSITION(dir) SET_CELL(dir ^ 1, C, transition( \
-  GET_CELL(dir ^ 0, C), \
+  GET_CELL(dir, C), \
   uint[]( \
     ${u.repeat(c.NUM_NEIGHBORS, i => `GET_CELL(dir ^ 0, idxes[${i}])`, ',')} \
   ) \
@@ -16,7 +16,7 @@ uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
   uint green = COUNT(neighborhood, GREEN);
   uint black = COUNT(neighborhood, BLACK);
 
-  if (green >= 3u && red >= 1u && blue >= 1u)
+  if (green >= 4u)
     return GREEN;
 
   if (center == GREEN)
@@ -28,10 +28,10 @@ uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
   if (center == RED)
     return BLACK;
 
-  if (green >= 1u)
+  if (green >= 1u && green <= 2u)
     return GREEN;
 
-  return BLACK;
+  return center;
 }
 
 
