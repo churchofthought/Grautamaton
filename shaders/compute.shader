@@ -12,42 +12,25 @@ layout( local_size_x = 1 ) in;
 
 uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
   uint red = COUNT(neighborhood, RED);
-  // uint red = COUNT(neighborhood, RED);
-  // uint green = COUNT(neighborhood, GREEN);
-  // uint black = COUNT(neighborhood, BLACK);
-  
-  // if (center == GREEN && red >= 1u)
-  //   return BLACK;
+  uint blue = COUNT(neighborhood, BLUE);
+  uint green = COUNT(neighborhood, GREEN);
+  uint black = COUNT(neighborhood, BLACK);
 
-  // if (center == BLUE && green >= 1u)
-  //   return BLACK;
+  if (green >= 2u && red >= 1u && blue >= 1u)
+    return GREEN;
 
-  // if (center == GREEN)
-  //   return BLUE;
-
+  if (center == GREEN)
+    return BLUE;
    
-
-  // if (center == BLUE)
-  //   return RED;
-  
-  // if (center == RED)
-  //   return BLACK;
-
-  // if (red >= 1u || green >= 1u)
-  //   return BLACK;
-
-  // if (blue >= 5u)
-  //   return GREEN;
-  
-  if (red >= 1u)
+  if (center == BLUE)
     return RED;
+  
+  if (center == RED)
+    return BLACK;
 
+  if (green >= 1u)
+    return GREEN;
 
-   
-  // if (center == GREEN)
-  //   return RED;
-  // if (COUNT(neighborhood, GREEN) >= 1u && center == BLACK)
-  //   return GREEN;	
   return BLACK;
 }
 

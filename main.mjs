@@ -22,6 +22,7 @@ window.onload = async () => {
 	document.documentElement.style = document.body.style = `
 		padding: 0;
 		margin: 0;
+		margin-top: 2em;
 		text-align: center;
 	`
 
