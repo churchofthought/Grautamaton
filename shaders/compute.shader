@@ -19,6 +19,7 @@ uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
   uint black = COUNT(neighborhood, BLACK);
 
   if (green >= 4u)
+
     return BLACK;
 
   if (center == GREEN)
