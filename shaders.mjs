@@ -2,11 +2,11 @@ import c from "./constants.mjs"
 import u from "./util.mjs"
 
 export default async gl => {
-	
+	var ts = u.getSearchParam("ts")
 
 	const header = (await (await fetch("./shaders/header.shader")).text()).replace(/\\/g,"\\\\")
 	const HEADER_INCLUDE = type => eval(`\`${header}\``)
-
+	
 	const evalAsTemplate = (s) => eval(`\`${s.replace(/\\/g,"\\\\")}\``)
 	const getShaderFile = async file => 
 		[file, evalAsTemplate(await (await fetch(`./shaders/${file}.shader`)).text())]
@@ -47,7 +47,8 @@ export default async gl => {
 		return program
 	}
 
-	return {
+
+	const programs = {
 		renderProgram: createProgram([
 			[shaderSources.vertex, "VERTEX_SHADER"],
 			[shaderSources.fragment, "FRAGMENT_SHADER"]
@@ -56,4 +57,9 @@ export default async gl => {
 			[shaderSources.compute, "COMPUTE_SHADER"]
 		])
 	}
+		
+	//if no errors, lets update the url to point to current shader, for sharing
+	window.history.pushState( {} , document.title, location.pathname + "?ts=" + ts)
+
+	return programs
 }

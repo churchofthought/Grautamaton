@@ -154,19 +154,19 @@ window.onload = async () => {
 
 			// left click
 			case 0:
-				return 3
+				return 0
 
 			// right click
 			case 1:
-				return 2
+				return 1
 	
 			// middle click
 			case 2:
-				return 1
+				return 2
 
 			// ????
 			default:
-				return 0
+				return 3
 			}
 		})()
 

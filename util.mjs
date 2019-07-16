@@ -6,6 +6,9 @@ u.mod = (x, y) => {
 }
 u.repeat = (x,f,d="") => (Array.isArray(x) ? x : Array.from(Array(x).keys())).map(f).join(d)
 
+const searchParams = new URLSearchParams(location.search)
+u.getSearchParam = x => searchParams.get(x)
+
 // u.maxXY = (neighborhood, w, h) => {
 // 	const p = u.projectors[neighborhood]
 // 	const vals = [

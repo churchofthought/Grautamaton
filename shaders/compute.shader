@@ -11,13 +11,15 @@ layout( local_size_x = 1 ) in;
 ));
 
 uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
+  ${ts = ts || `
+
   uint red = COUNT(neighborhood, RED);
   uint blue = COUNT(neighborhood, BLUE);
   uint green = COUNT(neighborhood, GREEN);
   uint black = COUNT(neighborhood, BLACK);
 
-  if (green >= 4u)
-    return GREEN;
+  if (green >= 2u)
+    return BLACK;
 
   if (center == GREEN)
     return BLUE;
@@ -28,10 +30,12 @@ uint transition(uint center, uint[NUM_NEIGHBORS] neighborhood){
   if (center == RED)
     return BLACK;
 
-  if (green >= 1u && green <= 2u)
+  if (green >= 1u)
     return GREEN;
 
   return center;
+
+  `}
 }
 
 
