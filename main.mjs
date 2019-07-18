@@ -81,7 +81,7 @@ window.onload = async () => {
 
 		const arr = new Float32Array(constants.UNIVERSE_FLOAT_SIZE)
 
-		arr[mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = 100000
+		arr[mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,32)
 		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
 		// 	arr[i] = Math.random()
 		// }

@@ -12,8 +12,8 @@ layout( local_size_x = 1 ) in;
 
 float transition(float center, float[NUM_NEIGHBORS] neighborhood){
   ${ts = ts || `
-    float sum = ${u.repeat(c.NUM_NEIGHBORS, i => `(neighborhood[${i}] >= 0.5 ? (neighborhood[${i}] / 8.0) : 0.0)`, '+')};
-    if (center >= 0.5)
+    float sum = ${u.repeat(c.NUM_NEIGHBORS, i => `(neighborhood[${i}] >= 0.99 ? (neighborhood[${i}] / 8.0) : 0.0)`, '+')};
+    if (center >= 0.4)
       center *= 1.0/8.0;
     return center + sum;
   `}
