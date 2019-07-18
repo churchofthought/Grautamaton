@@ -27,11 +27,14 @@ void main(void) {
 	})()}
 	
 	coords = mod(round(coords), vec2(UNIVERSE_WIDTH, UNIVERSE_HEIGHT));
-	uvec2 index = idx(uint(coords.x), uint(coords.y));
+	uint index = idx(uint(coords.x), uint(coords.y));
 	
+	float val;
 	if ((time & 1u) == 1u){
-		fragColor = colors[GET_CELL(1, index)];
+		val = GET_CELL(1, index);
 	}else{
-		fragColor = colors[GET_CELL(0, index)];
+		val = GET_CELL(0, index);
 	}
+
+	fragColor = vec4(val, val, val, 1.0);
 }

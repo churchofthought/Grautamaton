@@ -61,7 +61,7 @@ export default async gl => {
 	console.log(`sharing url: http://127.0.0.1:8080/index.html?ts=${encodeURIComponent(ts)}`)
 		
 	//if no errors, lets update the url to point to current shader, for sharing
-	// window.history.pushState( {} , document.title, location.pathname + "?ts=" + ts)
+	//window.history.replaceState( {} , document.title, location.pathname + "?rule=" + (+u.getSearchParam("rule") + 1))
 
 	return programs
 }

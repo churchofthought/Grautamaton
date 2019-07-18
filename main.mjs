@@ -62,14 +62,28 @@ window.onload = async () => {
 	const { renderProgram, computeProgram } = await createPrograms(gl)
 
 	setupBlitting(gl, renderProgram)
+
+	const mousePosToArr = (rawX, rawY) => {
+		const [x, y] = constants.PROJECTOR(
+			rawX, 
+			constants.CANVAS_HEIGHT - rawY
+		)
+
+		const u = util.mod(x, constants.UNIVERSE_WIDTH)
+		const v = util.mod(y, constants.UNIVERSE_HEIGHT)
+		
+		return u * constants.UNIVERSE_HEIGHT + v
+	}
+
 	const bindUniverse = idx => {
 		const buffer = gl.createBuffer()
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
 
-		// const arr = new Uint8Array(constants.UNIVERSE_BYTE_SIZE)
+		const arr = new Float32Array(constants.UNIVERSE_FLOAT_SIZE)
 
-		// for (var i = constants.UNIVERSE_BYTE_SIZE; i--;){
-		// 	arr[i] = Math.floor(Math.random() * 256)
+		arr[mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = 100000
+		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
+		// 	arr[i] = Math.random()
 		// }
 
 		//arr[constants.UNIVERSE_SIZE - 1] = 20000
@@ -83,7 +97,7 @@ window.onload = async () => {
 		// 	arr[i] = Math.floor(Math.random() * 256)
 		// }
 
-		gl.bufferData(gl.SHADER_STORAGE_BUFFER, /*arr*/ constants.UNIVERSE_BYTE_SIZE, gl.DYNAMIC_COPY)
+		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr /* constants.UNIVERSE_BYTE_SIZE */, gl.DYNAMIC_COPY)
 		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, idx, buffer)
 	}
 
@@ -120,34 +134,22 @@ window.onload = async () => {
 
 	render()
 
-	const universeView = new Uint8Array(1)
+	const universeView = new Float32Array(1)
 	var offsetX, offsetY, shiftKey, button
 	
 	const updateMouse = event => {
 		({shiftKey, offsetX, offsetY } = event)
 	}
-	const mousePosToArr = () => {
-		const [x, y] = constants.PROJECTOR(
-			offsetX, 
-			constants.CANVAS_HEIGHT - offsetY
-		)
-
-		const u = util.mod(x, constants.UNIVERSE_WIDTH)
-		const v = util.mod(y, constants.UNIVERSE_HEIGHT)
-		
-		return u * constants.UNIVERSE_HEIGHT + v
-	}
 
 	const mousedownHandler = () => {
-		const offset = constants.CELL_BITS * mousePosToArr()
+		const offset = constants.CELL_BITS * mousePosToArr(offsetX, offsetY)
 		const byteOffset = offset / 8
-		const bitOffset = offset % 8
 		gl.getBufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
 
-		const orig = (universeView[0] & ((constants.NUM_STATES - 1) << bitOffset)) >> bitOffset
+		const orig = universeView[0]
 
 		//clear current value 
-		universeView[0] &= ~((constants.NUM_STATES - 1) << bitOffset)
+		universeView[0] = 0
 
 		const newVal = (() => {
 			switch (button) {
@@ -170,7 +172,7 @@ window.onload = async () => {
 			}
 		})()
 
-		universeView[0] |= util.mod(shiftKey ? orig - newVal : newVal, constants.NUM_STATES) << bitOffset
+		universeView[0] = shiftKey ? orig - newVal : newVal
 
 		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, byteOffset, universeView)
 	}
