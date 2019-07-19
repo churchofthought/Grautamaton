@@ -22,7 +22,7 @@ precision highp int;
 
 
 layout(std430, binding = 0) coherent restrict ${type == "FRAGMENT" ? "readonly" : ""} buffer UniverseBufferData {
-	uint[UNIVERSE_INT_SIZE] cells;
+	uint[] cells;
 } universe[2];
 
 layout(std140) uniform meta {

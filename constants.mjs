@@ -27,7 +27,6 @@ const projector = (() => {
 })()
 Object.defineProperty(c, "PROJECTOR", { value: projector, enumerable: false })
 
-
 c.CANVAS_WIDTH = 1920 
 c.CANVAS_HEIGHT = 1080
 
