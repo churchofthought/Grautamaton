@@ -31,10 +31,13 @@ void main(void) {
 	
 	float val;
 	if ((time & 1u) == 1u){
-		val = GET_CELL(1, index);
-	}else{
 		val = GET_CELL(0, index);
+	}else{
+		val = GET_CELL(1, index);
 	}
 
-	fragColor = vec4(val, val, val, 1.0);
+	float fMinVal = IFloatFlip(minVal);
+	float fMaxVal = IFloatFlip(maxVal);
+	float col = pow((val - fMinVal) / (fMaxVal - fMinVal), 2.0);
+	fragColor =  vec4(col, col, col, 1.0);
 }

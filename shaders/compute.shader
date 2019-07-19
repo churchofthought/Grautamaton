@@ -3,17 +3,20 @@ ${HEADER_INCLUDE("COMPUTE")}
 
 layout( local_size_x = 1 ) in;
 
-#define TRANSITION(dir) SET_CELL(dir ^ 1, C, transition( \
-  GET_CELL(dir, C), \
-  float[]( \
-    ${u.repeat(c.NUM_NEIGHBORS, i => `GET_CELL(dir ^ 0, idxes[${i}])`, ',')} \
-  ) \
-));
+#define TRANSITION(dir) ${u.cmacro(`
+  SET_CELL(dir ^ 1, C, transition( 
+    GET_CELL(dir, C), 
+    float[]( 
+      ${u.repeat(c.NUM_NEIGHBORS, i => `GET_CELL(dir ^ 0, idxes[${i}])`, ',')} 
+    ) 
+  ));
+`)}
 
 float transition(float center, float[NUM_NEIGHBORS] neighborhood){
   ${ts = ts || `
-    float sum = ${u.repeat(c.NUM_NEIGHBORS, i => `(neighborhood[${i}] >= 0.99 ? (neighborhood[${i}] / 8.0) : 0.0)`, '+')};
-    if (center >= 0.4)
+    float e = pow(10.0, -30.0);
+    float sum = ${u.repeat(c.NUM_NEIGHBORS, i => `(neighborhood[${i}] >= e ? (neighborhood[${i}] / 8.0) : 0.0)`, '+')};
+    if (center >= e)
       center *= 1.0/8.0;
     return center + sum;
   `}

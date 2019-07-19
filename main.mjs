@@ -81,7 +81,7 @@ window.onload = async () => {
 
 		const arr = new Float32Array(constants.UNIVERSE_FLOAT_SIZE)
 
-		arr[mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,32)
+		arr[mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,38)
 		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
 		// 	arr[i] = Math.random()
 		// }
@@ -102,30 +102,44 @@ window.onload = async () => {
 	}
 
 	const bindRenderMeta = () => {
-		const buffer = gl.createBuffer()
-		gl.bindBuffer(gl.UNIFORM_BUFFER, buffer)
+		const buffer2 = gl.createBuffer()
+		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer2)
+		gl.bufferData(gl.SHADER_STORAGE_BUFFER, 2 * 4, gl.DYNAMIC_COPY)
+		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, 2, buffer2)
+
+		const buffer3 = gl.createBuffer()
+		gl.bindBuffer(gl.UNIFORM_BUFFER, buffer3)
 		gl.bufferData(gl.UNIFORM_BUFFER, 16, gl.DYNAMIC_DRAW)
-		gl.bindBufferBase(gl.UNIFORM_BUFFER, 2, buffer)
+		gl.bindBufferBase(gl.UNIFORM_BUFFER, 3, buffer3)
 		//gl.bindBufferRange(gl.UNIFORM_BUFFER, 2, buffer, 0, 16)
-		for (const x of [computeProgram, renderProgram])
-			gl.uniformBlockBinding(x, 0, 2)
+		// for (const x of [computeProgram, renderProgram])
+		// 	gl.uniformBlockBinding(x, 0, 3)
 	}
 
 
-	bindRenderMeta();
+	
 	[1, 0].forEach(bindUniverse)
+	bindRenderMeta()
 
 	var time = new Uint32Array([0])
+	var metaDefaults = new Uint32Array([0xFFFFFFFF, 0])
 	var startTime = Date.now() / 1000
 
 	const render = () => {
+
+		//render
+		gl.useProgram(renderProgram)
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+
+		// ++time
 		status.textContent = `${(++time[0] / (Date.now() / 1000 - startTime)).toFixed(2)} fps`
 		gl.bufferSubData(gl.UNIFORM_BUFFER, 0, time)
 		//gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT);
-
-		gl.useProgram(renderProgram)
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 		
+		// reset min/max colors after render, before next compute
+		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, 0, metaDefaults)
+		
+		// compute next frame
 		gl.useProgram(computeProgram)
 		gl.dispatchCompute(constants.UNIVERSE_WIDTH, constants.UNIVERSE_HEIGHT, 1)
 		

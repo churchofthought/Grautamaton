@@ -5,6 +5,8 @@ u.mod = (x, y) => {
 	return Math.floor(m >= 0 ? m : (m + y))
 }
 u.repeat = (x,f,d="") => (Array.isArray(x) ? x : Array.from(Array(x).keys())).map(f).join(d)
+u.cmacro = x => x.replace(/[\r\n]/g, "\\$&")
+
 
 const searchParams = new URLSearchParams(location.search)
 u.getSearchParam = x => searchParams.get(x)
