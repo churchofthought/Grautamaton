@@ -28,8 +28,8 @@ const projector = (() => {
 Object.defineProperty(c, "PROJECTOR", { value: projector, enumerable: false })
 
 
-c.CANVAS_WIDTH = 256 
-c.CANVAS_HEIGHT = 256
+c.CANVAS_WIDTH = 1024 
+c.CANVAS_HEIGHT = 1024
 
 
 // use projector to scale the universe to minimum size
