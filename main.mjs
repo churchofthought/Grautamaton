@@ -90,8 +90,15 @@ window.onload = async () => {
 
 		const arr = new Float32Array(constants.UNIVERSE_FLOAT_SIZE)
 
+		// for (var x = 0; x < constants.CANVAS_WIDTH; x++)
+		// 	for (var y = 0; y < constants.CANVAS_HEIGHT; y++) {
+		// 		arr[2 * mousePosToArr(x, y)] = x - constants.CANVAS_WIDTH / 2
+		// 		arr[2 * mousePosToArr(x, y) + 1] = y - constants.CANVAS_HEIGHT / 2
+		// 	}
+
 		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,1)
 		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = -Math.pow(10,1)
+		
 		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
 		// 	arr[i] = 2 * Math.random() - 1
 		// }

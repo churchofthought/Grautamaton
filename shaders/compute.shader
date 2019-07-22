@@ -22,7 +22,8 @@ vec2 rotate(vec2 v, float a) {
 
 CELL_TYPE transition(CELL_TYPE center, CELL_TYPE[NUM_NEIGHBORS] neighborhood){
   ${ts = ts || `
-    float e = 0.000000001;
+    // return center;
+    float e = 0.0000001;
     float ratio = 1.0/400.0;
     CELL_TYPE sum = ${u.repeat(c.NUM_NEIGHBORS, i => `(zAbs(neighborhood[${i}]) >= e ? ((1.0 - ratio) * rotate(neighborhood[${i}], 3.14/2.0) / float(NUM_NEIGHBORS)) : vec2(0.0,0.0))`, '+')};
     if (zAbs(center) >= e)

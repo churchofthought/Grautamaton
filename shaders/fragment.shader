@@ -10,7 +10,7 @@ vec3 hsl2rgb(float x, float y, float z)
 {
     vec3 rgb = clamp(
 			abs(
-				mod(x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0
+				mod(3.0 - x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0
 			) - 1.0,
 		0.0, 1.0);
 
@@ -55,6 +55,6 @@ void main(void) {
 	float scaled = (val - fMinVal) / (fMaxVal - fMinVal);
 
 	fragColor = hsl2rgb(
-		angle, 1.0, 1.0 - pow(scaled, 1.0) //pow(0.25, scaled)
+		angle, 1.0, pow(scaled, 0.25) //pow(0.25, scaled)
 	);
 }
