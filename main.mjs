@@ -50,7 +50,16 @@ window.onload = async () => {
 	container.appendChild(status)
 	document.body.appendChild(container)
 
-	const gl = canvas.getContext("webgl2-compute")
+	const gl = canvas.getContext("webgl2-compute", {
+		alpha: false, 
+		depth: false, 
+		stencil: false, 
+		antialias: false, 
+		// preserveDrawingBuffer: false, 
+		powerPreference: "high-performance", 
+		failIfMajorPerformanceCaveat: true,
+		// desynchronized: true
+	})
 	// Only continue if WebGL is available and working
 	if (!gl)
 		throw "Unable to initialize WebGL2 Compute. Your browser or machine may not support it."
@@ -81,9 +90,10 @@ window.onload = async () => {
 
 		const arr = new Float32Array(constants.UNIVERSE_FLOAT_SIZE)
 
-		arr[mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,38)
+		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,1)
+		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = -Math.pow(10,1)
 		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
-		// 	arr[i] = Math.random()
+		// 	arr[i] = 2 * Math.random() - 1
 		// }
 
 		//arr[constants.UNIVERSE_SIZE - 1] = 20000
@@ -128,8 +138,10 @@ window.onload = async () => {
 	const render = () => {
 
 		//render
-		gl.useProgram(renderProgram)
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+		// if (time % 100 == 0){
+			gl.useProgram(renderProgram)
+			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+		// }
 
 		// ++time
 		status.textContent = `${(++time[0] / (Date.now() / 1000 - startTime)).toFixed(2)} fps`

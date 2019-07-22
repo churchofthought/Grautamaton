@@ -1,5 +1,3 @@
-const logb = (n, base) => Math.ceil(Math.log(n) / Math.log(base))
-
 const c = {}
 
 const neighbors = []
@@ -44,7 +42,7 @@ c.UNIVERSE_HEIGHT = Math.floor(t2[1])
 
 c.UNIVERSE_SIZE = c.UNIVERSE_WIDTH * c.UNIVERSE_HEIGHT
 
-c.CELL_BITS = 32
+c.CELL_BITS = 64
 
 c.UNIVERSE_BIT_SIZE = c.UNIVERSE_SIZE * c.CELL_BITS
 c.UNIVERSE_BYTE_SIZE = Math.ceil(c.UNIVERSE_BIT_SIZE / 8)

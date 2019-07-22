@@ -6,18 +6,27 @@ layout( local_size_x = 1 ) in;
 #define TRANSITION(dir) ${u.cmacro(`
   SET_CELL(dir ^ 1, C, transition( 
     GET_CELL(dir, C), 
-    float[]( 
+    CELL_TYPE[]( 
       ${u.repeat(c.NUM_NEIGHBORS, i => `GET_CELL(dir ^ 0, idxes[${i}])`, ',')} 
     ) 
   ));
 `)}
 
-float transition(float center, float[NUM_NEIGHBORS] neighborhood){
+
+vec2 rotate(vec2 v, float a) {
+	float s = sin(a);
+	float c = cos(a);
+	mat2 m = mat2(c, -s, s, c);
+	return m * v;
+}
+
+CELL_TYPE transition(CELL_TYPE center, CELL_TYPE[NUM_NEIGHBORS] neighborhood){
   ${ts = ts || `
-    float e = pow(10.0, -30.0);
-    float sum = ${u.repeat(c.NUM_NEIGHBORS, i => `(neighborhood[${i}] >= e ? (neighborhood[${i}] / 8.0) : 0.0)`, '+')};
-    if (center >= e)
-      center *= 1.0/8.0;
+    float e = 0.000000001;
+    float ratio = 1.0/400.0;
+    CELL_TYPE sum = ${u.repeat(c.NUM_NEIGHBORS, i => `(zAbs(neighborhood[${i}]) >= e ? ((1.0 - ratio) * rotate(neighborhood[${i}], 3.14/2.0) / float(NUM_NEIGHBORS)) : vec2(0.0,0.0))`, '+')};
+    if (zAbs(center) >= e)
+      center *= ratio;
     return center + sum;
   `}
 }

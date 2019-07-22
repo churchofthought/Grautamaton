@@ -12,8 +12,4 @@ export default (gl, program) => {
 		1, -1,
 		1, 1
 	]), gl.STATIC_DRAW)
-	
-
-	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 }
