@@ -6,17 +6,6 @@ ${HEADER_INCLUDE("FRAGMENT")}
 
 out vec3 fragColor;
 
-vec3 hsl2rgb(float x, float y, float z)
-{
-    vec3 rgb = clamp(
-			abs(
-				mod(3.0 - x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0
-			) - 1.0,
-		0.0, 1.0);
-
-    return z + y * (rgb - 0.5) * (1.0 - abs(2.0 * z - 1.0));
-}
-
 void main(void) {
 	vec2 coords = gl_FragCoord.xy;
 
@@ -47,14 +36,5 @@ void main(void) {
 		z = GET_CELL(1, index);
 	}
 
-	float val = zAbs(z);
-	float angle = zArg(z);
-
-	float fMinVal = IFloatFlip(minVal);
-	float fMaxVal = IFloatFlip(maxVal);
-	float scaled = (val - fMinVal) / (fMaxVal - fMinVal);
-
-	fragColor = hsl2rgb(
-		angle, 1.0, pow(scaled, 0.25) //pow(0.25, scaled)
-	);
+	fragColor = z.x > 0 || z.y > 0 ? vec3(1.0,1.0,1.0) : vec3(0.0,0.0,0.0);
 }

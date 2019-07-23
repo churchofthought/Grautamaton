@@ -47,7 +47,6 @@ c.CELL_BITS = 64
 c.UNIVERSE_BIT_SIZE = c.UNIVERSE_SIZE * c.CELL_BITS
 c.UNIVERSE_BYTE_SIZE = Math.ceil(c.UNIVERSE_BIT_SIZE / 8)
 c.UNIVERSE_INT_SIZE = Math.ceil(c.UNIVERSE_BYTE_SIZE / 4)
-c.UNIVERSE_FLOAT_SIZE = c.UNIVERSE_INT_SIZE
 
 c.cDefines = Object.entries(c).map(([x, y]) => `#define ${x} (${JSON.stringify(y)})`).join("\n")
 

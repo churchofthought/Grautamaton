@@ -12,23 +12,22 @@ layout( local_size_x = 1 ) in;
   ));
 `)}
 
+vec2 movements = {
 
-vec2 rotate(vec2 v, float a) {
-	float s = sin(a);
-	float c = cos(a);
-	mat2 m = mat2(c, -s, s, c);
-	return m * v;
+}
+
+bool is_incoming(vec2 velocity, vec2 offs){
+  uint dist = max(abs(velocity.x), abs(velocity.y), abs(velocity.x + velocity.y));
+  uint split = min(abs(velocity.x), abs(velocity.y), abs(velocity.x + velocity.y));
+  
+  uint move = time % dist >= split ? movement_1 : movement_2;
+  // sign of x, sign of y
 }
 
 CELL_TYPE transition(CELL_TYPE center, CELL_TYPE[NUM_NEIGHBORS] neighborhood){
   ${ts = ts || `
-    // return center;
-    float e = 0.0000001;
-    float ratio = 1.0/400.0;
-    CELL_TYPE sum = ${u.repeat(c.NUM_NEIGHBORS, i => `(zAbs(neighborhood[${i}]) >= e ? ((1.0 - ratio) * rotate(neighborhood[${i}], 3.14/2.0) / float(NUM_NEIGHBORS)) : vec2(0.0,0.0))`, '+')};
-    if (zAbs(center) >= e)
-      center *= ratio;
-    return center + sum;
+    
+    return center;
   `}
 }
 

@@ -88,7 +88,7 @@ window.onload = async () => {
 		const buffer = gl.createBuffer()
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
 
-		const arr = new Float32Array(constants.UNIVERSE_FLOAT_SIZE)
+		const arr = new Uint32Array(constants.UNIVERSE_INT_SIZE)
 
 		// for (var x = 0; x < constants.CANVAS_WIDTH; x++)
 		// 	for (var y = 0; y < constants.CANVAS_HEIGHT; y++) {
@@ -96,8 +96,8 @@ window.onload = async () => {
 		// 		arr[2 * mousePosToArr(x, y) + 1] = y - constants.CANVAS_HEIGHT / 2
 		// 	}
 
-		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,1)
-		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = -Math.pow(10,1)
+		// arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,1)
+		// arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = -Math.pow(10,1)
 		
 		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
 		// 	arr[i] = 2 * Math.random() - 1
@@ -120,14 +120,9 @@ window.onload = async () => {
 
 	const bindRenderMeta = () => {
 		const buffer2 = gl.createBuffer()
-		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer2)
-		gl.bufferData(gl.SHADER_STORAGE_BUFFER, 2 * 4, gl.DYNAMIC_COPY)
-		gl.bindBufferBase(gl.SHADER_STORAGE_BUFFER, 2, buffer2)
-
-		const buffer3 = gl.createBuffer()
-		gl.bindBuffer(gl.UNIFORM_BUFFER, buffer3)
+		gl.bindBuffer(gl.UNIFORM_BUFFER, buffer2)
 		gl.bufferData(gl.UNIFORM_BUFFER, 16, gl.DYNAMIC_DRAW)
-		gl.bindBufferBase(gl.UNIFORM_BUFFER, 3, buffer3)
+		gl.bindBufferBase(gl.UNIFORM_BUFFER, 2, buffer2)
 		//gl.bindBufferRange(gl.UNIFORM_BUFFER, 2, buffer, 0, 16)
 		// for (const x of [computeProgram, renderProgram])
 		// 	gl.uniformBlockBinding(x, 0, 3)
@@ -139,7 +134,6 @@ window.onload = async () => {
 	bindRenderMeta()
 
 	var time = new Uint32Array([0])
-	var metaDefaults = new Uint32Array([0xFFFFFFFF, 0])
 	var startTime = Date.now() / 1000
 
 	const render = () => {
@@ -154,9 +148,6 @@ window.onload = async () => {
 		status.textContent = `${(++time[0] / (Date.now() / 1000 - startTime)).toFixed(2)} fps`
 		gl.bufferSubData(gl.UNIFORM_BUFFER, 0, time)
 		//gl.memoryBarrier(gl.SHADER_STORAGE_BARRIER_BIT);
-		
-		// reset min/max colors after render, before next compute
-		gl.bufferSubData(gl.SHADER_STORAGE_BUFFER, 0, metaDefaults)
 		
 		// compute next frame
 		gl.useProgram(computeProgram)
