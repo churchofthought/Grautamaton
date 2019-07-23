@@ -12,22 +12,43 @@ layout( local_size_x = 1 ) in;
   ));
 `)}
 
-vec2 movements = {
+ivec2[4][2] movements = ivec2[][](
+  ivec2[](
+    ivec2(+1,0), ivec2(0,+1)
+  ),
+  ivec2[](
+    ivec2(+1,-1), ivec2(+1,0) 
+  ),
+  ivec2[](
+    ivec2(-1,+1), ivec2(-1,0)
+  ),
+  ivec2[](
+    ivec2(-1,0), ivec2(0,-1)
+  )
+);
 
+bool is_incoming(ivec2 velocity, ivec2 offs){
+  if (velocity == ivec2(0,0))
+    return false;
+    
+  uint dist = max(max(uint(abs(velocity.x)), uint(abs(velocity.y))), uint(abs(velocity.x + velocity.y)));
+  uint split = min(min(uint(abs(velocity.x)), uint(abs(velocity.y))), uint(abs(velocity.x + velocity.y)));
+
+  uint moves_idx = (sign(velocity.x) >= 0 ? 0u : 2u) + (sign(velocity.y) >= 0 ? 0u : 1u);
+  ivec2 move = time % dist >= split ? movements[moves_idx][0] : movements[moves_idx][1];
+  return offs == move;
 }
 
-bool is_incoming(vec2 velocity, vec2 offs){
-  uint dist = max(abs(velocity.x), abs(velocity.y), abs(velocity.x + velocity.y));
-  uint split = min(abs(velocity.x), abs(velocity.y), abs(velocity.x + velocity.y));
-  
-  uint move = time % dist >= split ? movement_1 : movement_2;
-  // sign of x, sign of y
-}
 
 CELL_TYPE transition(CELL_TYPE center, CELL_TYPE[NUM_NEIGHBORS] neighborhood){
   ${ts = ts || `
-    
-    return center;
+    ${
+      u.repeat(c.NEIGHBORHOOD, ([x,y],i) => `
+        if (is_incoming(neighborhood[${i}], ivec2(${-x},${y}))){
+          return neighborhood[${i}];
+        } 
+    `)}
+    return ivec2(0,0);
   `}
 }
 

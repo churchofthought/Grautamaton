@@ -88,7 +88,7 @@ window.onload = async () => {
 		const buffer = gl.createBuffer()
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
 
-		const arr = new Uint32Array(constants.UNIVERSE_INT_SIZE)
+		const arr = new Int32Array(constants.UNIVERSE_INT_SIZE)
 
 		// for (var x = 0; x < constants.CANVAS_WIDTH; x++)
 		// 	for (var y = 0; y < constants.CANVAS_HEIGHT; y++) {
@@ -96,8 +96,8 @@ window.onload = async () => {
 		// 		arr[2 * mousePosToArr(x, y) + 1] = y - constants.CANVAS_HEIGHT / 2
 		// 	}
 
-		// arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = Math.pow(10,1)
-		// arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = -Math.pow(10,1)
+		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = 50
+		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = 50
 		
 		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
 		// 	arr[i] = 2 * Math.random() - 1
@@ -158,7 +158,7 @@ window.onload = async () => {
 
 	render()
 
-	const universeView = new Float32Array(1)
+	const universeView = new Int32Array(1)
 	var offsetX, offsetY, shiftKey, button
 	
 	const updateMouse = event => {
