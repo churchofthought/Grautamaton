@@ -1,6 +1,6 @@
 ${c.cDefines}
 
-#define CELL_TYPE ivec4
+#define CELL_TYPE ivec2
 
 #define GET_CELL(dir, index) (universe[dir].cells[index])
 
