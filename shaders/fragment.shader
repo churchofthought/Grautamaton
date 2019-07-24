@@ -36,5 +36,5 @@ void main(void) {
 		z = GET_CELL(1, index);
 	}
 
-	fragColor = z.x > 0 || z.y > 0 ? vec3(1.0,1.0,1.0) : vec3(0.0,0.0,0.0);
+	fragColor = z == ivec2(0,0) ? vec3(0.0,0.0,0.0) : vec3(1.0,1.0,1.0);
 }

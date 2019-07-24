@@ -39,12 +39,27 @@ bool is_incoming(ivec2 velocity, ivec2 offs){
   return offs == move;
 }
 
+CELL_TYPE add_cells(ivec4 a, ivec4 b){
+  // anti-matter
+  if (a.z >= 1){
+    a.xy *= -1;
+  }
+
+ // anti-matter
+  if (b.z >= 1){
+    b.xy *= -1;
+  }
+
+  // a.xy *= b.y
+  // b.xy *= a.y
+}
+
 
 CELL_TYPE transition(CELL_TYPE center, CELL_TYPE[NUM_NEIGHBORS] neighborhood){
   ${ts = ts || `
     ${
       u.repeat(c.NEIGHBORHOOD, ([x,y],i) => `
-        if (is_incoming(neighborhood[${i}], ivec2(${-x},${y}))){
+        if (is_incoming(neighborhood[${i}], ivec2(${-x},${-y}))){
           return neighborhood[${i}];
         } 
     `)}
