@@ -26,8 +26,8 @@ const projector = (() => {
 Object.defineProperty(c, "PROJECTOR", { value: projector, enumerable: false })
 
 
-c.CANVAS_WIDTH = 100 
-c.CANVAS_HEIGHT = 100
+c.CANVAS_WIDTH = 1024 
+c.CANVAS_HEIGHT = 768
 
 
 // use projector to scale the universe to minimum size
@@ -42,7 +42,7 @@ c.UNIVERSE_HEIGHT = Math.floor(t2[1])
 
 c.UNIVERSE_SIZE = c.UNIVERSE_WIDTH * c.UNIVERSE_HEIGHT
 
-c.CELL_BITS = 64
+c.CELL_BITS = 32 * 3
 
 c.UNIVERSE_BIT_SIZE = c.UNIVERSE_SIZE * c.CELL_BITS
 c.UNIVERSE_BYTE_SIZE = Math.ceil(c.UNIVERSE_BIT_SIZE / 8)

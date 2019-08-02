@@ -29,12 +29,12 @@ void main(void) {
 	coords = mod(round(coords), vec2(UNIVERSE_WIDTH, UNIVERSE_HEIGHT));
 	uint index = idx(uint(coords.x), uint(coords.y));
 	
-	CELL_TYPE z;
+	CELL_TYPE c;
 	if ((time & 1u) == 1u){
-		z = GET_CELL(0, index);
+		c = GET_CELL(0, index);
 	}else{
-		z = GET_CELL(1, index);
+		c = GET_CELL(1, index);
 	}
 
-	fragColor = z == ivec2(0,0) ? vec3(0.0,0.0,0.0) : vec3(1.0,1.0,1.0);
+	fragColor = c.z == 0 ? vec3(0.0,0.0,0.0) : vec3(1.0,1.0,1.0);
 }

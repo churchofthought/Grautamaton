@@ -1,6 +1,6 @@
 ${c.cDefines}
 
-#define CELL_TYPE ivec2
+#define CELL_TYPE ivec3
 
 #define GET_CELL(dir, index) (universe[dir].cells[index])
 
@@ -28,4 +28,19 @@ uint omod(uint x, int o, uint y){
 
 uint idx(uint x, uint y){
 	return x * uint(UNIVERSE_HEIGHT) + y;
+}
+
+
+int get_gcd(int u, int v) {
+	// u = abs(u);
+	// v = abs(v);
+	// While loop is not always allowed, use a for loop.
+	do {
+		if (v == 0) break;
+		u = u % v;
+		if (u == 0) break;
+		v = v % u;
+	} while (true);
+
+	return u + v;
 }
