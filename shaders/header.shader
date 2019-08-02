@@ -1,6 +1,6 @@
 ${c.cDefines}
 
-#define CELL_TYPE ivec3
+#define CELL_TYPE ivec4
 
 #define GET_CELL(dir, index) (universe[dir].cells[index])
 
@@ -31,7 +31,7 @@ uint idx(uint x, uint y){
 }
 
 
-int get_gcd(int u, int v) {
+int gcd(int u, int v) {
 	// u = abs(u);
 	// v = abs(v);
 	// While loop is not always allowed, use a for loop.

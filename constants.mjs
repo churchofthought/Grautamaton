@@ -5,8 +5,9 @@ Object.defineProperty(c, "NEIGHBORHOOD_TYPE", { value: "hex", enumerable: false 
 Object.defineProperty(c, "NEIGHBORHOOD", { value: neighbors, enumerable: false })
 for (var x = -1; x <= 1; ++x) {
 	for (var y = -1; y <= 1; ++y) {
-		if (x == 0 && y == 0) continue
-		if (x == y && c.NEIGHBORHOOD_TYPE == "hex") continue
+		// if (x == 0 && y == 0) continue
+		// if (x == y && c.NEIGHBORHOOD_TYPE == "hex") continue
+		if (x && y && x == y && c.NEIGHBORHOOD_TYPE == "hex") continue
 		neighbors.push([x, y])
 	}
 }
@@ -42,7 +43,7 @@ c.UNIVERSE_HEIGHT = Math.floor(t2[1])
 
 c.UNIVERSE_SIZE = c.UNIVERSE_WIDTH * c.UNIVERSE_HEIGHT
 
-c.CELL_BITS = 32 * 3
+c.CELL_BITS = 32 * 4
 
 c.UNIVERSE_BIT_SIZE = c.UNIVERSE_SIZE * c.CELL_BITS
 c.UNIVERSE_BYTE_SIZE = Math.ceil(c.UNIVERSE_BIT_SIZE / 8)

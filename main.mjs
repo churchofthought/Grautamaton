@@ -55,10 +55,10 @@ window.onload = async () => {
 		depth: false, 
 		stencil: false, 
 		antialias: false, 
-		// preserveDrawingBuffer: false, 
+		preserveDrawingBuffer: false, 
 		powerPreference: "high-performance", 
 		failIfMajorPerformanceCaveat: true,
-		// desynchronized: true
+		desynchronized: true
 	})
 	// Only continue if WebGL is available and working
 	if (!gl)
@@ -96,9 +96,9 @@ window.onload = async () => {
 		// 		arr[2 * mousePosToArr(x, y) + 1] = y - constants.CANVAS_HEIGHT / 2
 		// 	}
 
-		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = 1
-		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = 1
-		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 2] = 1
+		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = 0
+		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = 0
+		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 2] = -1
 		
 		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
 		// 	arr[i] = 2 * Math.random() - 1
@@ -111,8 +111,8 @@ window.onload = async () => {
 
 		//arr[0] = 1
 
-		// for (var i = Math.floor(constants.UNIVERSE_SIZE / 8 / 10); i--;){
-		// 	arr[i] = Math.floor(Math.random() * 256)
+		// for (var i = constants.UNIVERSE_INT_SIZE; i--;){
+		// 	arr[i] = (Math.random() > 0.5 ? 1 : -1) * Math.round(Math.random() * 1) 
 		// }
 
 		gl.bufferData(gl.SHADER_STORAGE_BUFFER, arr /* constants.UNIVERSE_BYTE_SIZE */, gl.DYNAMIC_COPY)
