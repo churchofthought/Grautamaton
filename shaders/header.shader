@@ -32,8 +32,8 @@ uint idx(uint x, uint y){
 
 
 int gcd(int u, int v) {
-	// u = abs(u);
-	// v = abs(v);
+	u = abs(u);
+	v = abs(v);
 	// While loop is not always allowed, use a for loop.
 	do {
 		if (v == 0) break;

@@ -29,7 +29,7 @@ ivec2[4][2] movements = ivec2[][](
 bool is_incoming(CELL_TYPE neighbor, ivec2 offs){
   if (neighbor.z == 0)
     return false;
-    
+
   ivec2 velocity = neighbor.xy * sign(neighbor.z);
   if (velocity == ivec2(0,0))
     return offs == ivec2(0,0);
@@ -48,17 +48,24 @@ void add_cells(out CELL_TYPE a, CELL_TYPE b){
   int dist_a = max(1, max(max(abs(a.x), abs(a.y)), abs(a.x + a.y)));
   int dist_b = max(1, max(max(abs(b.x), abs(b.y)), abs(b.x + b.y)));
 
+  int mtype = sign(a.z + b.z);
+
   // normalize each to their stepcount, and weight each by their mass (possibly negative mass)
-  a.xy *= dist_b * a.z;
-  b.xy *= dist_a * b.z;
+  a.xy *= dist_b * abs(a.z) * (mtype == sign(a.z) ? 1 : -1);
+  b.xy *= dist_a * abs(b.z) * (mtype == sign(b.z) ? 1 : -1);
+
 
   // calculate sum
   a += b;
+
+  
 
   // reduce the velocity to simplest form
   if (a.x != 0 && a.y != 0){
     a.xy /= gcd(a.x, a.y);
   }
+
+  
 }
 
 

@@ -91,11 +91,11 @@ window.onload = async () => {
 		const arr = new Int32Array(constants.UNIVERSE_INT_SIZE)
 		
 
-		for (var x = 0; x < constants.CANVAS_WIDTH; x+= 100)
-			for (var y = 0; y < constants.CANVAS_HEIGHT; y+= 100) {
+		for (var x = 0; x < constants.CANVAS_WIDTH; x+= 10)
+			for (var y = 0; y < constants.CANVAS_HEIGHT; y+= 10) {
 				arr[4 * mousePosToArr(x, y)] = Math.floor((Math.random() > 0.5 ? 1 : -1) * Math.round(Math.random() * 300))
 				arr[4 * mousePosToArr(x, y) + 1] = Math.floor((Math.random() > 0.5 ? 1 : -1) * Math.round(Math.random() * 300))
-				arr[4 * mousePosToArr(x, y) + 2] = Math.round(2 * Math.random())
+				arr[4 * mousePosToArr(x, y) + 2] = Math.round(2 * Math.random() - 1)
 			}
 
 		// arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = 0
