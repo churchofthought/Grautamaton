@@ -89,16 +89,18 @@ window.onload = async () => {
 		gl.bindBuffer(gl.SHADER_STORAGE_BUFFER, buffer)
 
 		const arr = new Int32Array(constants.UNIVERSE_INT_SIZE)
+		
 
-		// for (var x = 0; x < constants.CANVAS_WIDTH; x++)
-		// 	for (var y = 0; y < constants.CANVAS_HEIGHT; y++) {
-		// 		arr[2 * mousePosToArr(x, y)] = x - constants.CANVAS_WIDTH / 2
-		// 		arr[2 * mousePosToArr(x, y) + 1] = y - constants.CANVAS_HEIGHT / 2
-		// 	}
+		for (var x = 0; x < constants.CANVAS_WIDTH; x+= 100)
+			for (var y = 0; y < constants.CANVAS_HEIGHT; y+= 100) {
+				arr[4 * mousePosToArr(x, y)] = Math.floor((Math.random() > 0.5 ? 1 : -1) * Math.round(Math.random() * 300))
+				arr[4 * mousePosToArr(x, y) + 1] = Math.floor((Math.random() > 0.5 ? 1 : -1) * Math.round(Math.random() * 300))
+				arr[4 * mousePosToArr(x, y) + 2] = Math.round(2 * Math.random())
+			}
 
-		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = 0
-		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = 0
-		arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 2] = -1
+		// arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2)] = 0
+		// arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 1] = 0
+		// arr[2 * mousePosToArr(constants.CANVAS_WIDTH/2, constants.CANVAS_HEIGHT/2) + 2] = -1
 		
 		// for (var i = constants.UNIVERSE_FLOAT_SIZE; i--;){
 		// 	arr[i] = 2 * Math.random() - 1

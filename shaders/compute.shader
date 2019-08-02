@@ -27,6 +27,9 @@ ivec2[4][2] movements = ivec2[][](
 );
 
 bool is_incoming(CELL_TYPE neighbor, ivec2 offs){
+  if (neighbor.z == 0)
+    return false;
+    
   ivec2 velocity = neighbor.xy * sign(neighbor.z);
   if (velocity == ivec2(0,0))
     return offs == ivec2(0,0);
