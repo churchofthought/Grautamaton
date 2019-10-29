@@ -26,13 +26,15 @@ ivec2[4][2] movements = ivec2[][](
   )
 );
 
-bool is_incoming(CELL_TYPE neighbor, ivec2 offs){
+bool is_incoming(CELL_TYPE neighbor, ivec2 offs, uint i){
   if (neighbor.z == 0)
     return false;
 
   ivec2 velocity = neighbor.xy * sign(neighbor.z);
+
+  // if velocity is 0, oscillate randomly (ie mass)
   if (velocity == ivec2(0,0))
-    return offs == ivec2(0,0);
+    return (time % 7u) == i;
     
   uint dist = max(max(uint(abs(velocity.x)), uint(abs(velocity.y))), uint(abs(velocity.x + velocity.y)));
   uint split = min(min(uint(abs(velocity.x)), uint(abs(velocity.y))), uint(abs(velocity.x + velocity.y)));
@@ -51,9 +53,10 @@ void add_cells(out CELL_TYPE a, CELL_TYPE b){
   int mtype = sign(a.z + b.z);
 
   // normalize each to their stepcount, and weight each by their mass (possibly negative mass)
-  a.xy *= dist_b * abs(a.z) * (mtype == sign(a.z) ? 1 : -1);
-  b.xy *= dist_a * abs(b.z) * (mtype == sign(b.z) ? 1 : -1);
-
+  // a.xy *= dist_b * abs(a.z) * (mtype == sign(a.z) ? 1 : -1);
+  // b.xy *= dist_a * abs(b.z) * (mtype == sign(b.z) ? 1 : -1);
+  a.xy *= abs(a.z) * (mtype == sign(a.z) ? 1 : -1);
+  b.xy *= abs(b.z) * (mtype == sign(b.z) ? 1 : -1);
 
   // calculate sum
   a += b;
@@ -74,7 +77,7 @@ CELL_TYPE transition(CELL_TYPE[NUM_NEIGHBORS] neighborhood){
     CELL_TYPE v;
     ${  
       u.repeat(c.NEIGHBORHOOD, ([x,y],i) => `
-        if (is_incoming(neighborhood[${i}], ivec2(${-x},${-y}))){
+        if (is_incoming(neighborhood[${i}], ivec2(${-x},${-y}), ${i}u)){
           add_cells(v, neighborhood[${i}]);
         }
     `)}
