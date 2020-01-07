@@ -10,7 +10,7 @@ Grautmaton uses ES2019 syntax and the mjs module system for extremely concise an
 # WebGL 2.0 Compute 
 must be enabled by running Chrome with necessary flags as so:
 
-*"C:\Program Files (x86)\Google\Chrome Beta\Application\chrome.exe" --use-cmd-decoder=passthrough --enable-webgl2-compute-context --use-angle=gl*
+*&"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --use-cmd-decoder=passthrough --enable-webgl2-compute-context --use-angle=gl*
 
 # Demo GIF
 ![Demo GIF](readme/anim.gif "Demo Gif")
